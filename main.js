@@ -4,21 +4,26 @@ function setup() {
   createCanvas(windowWidth, windowHeight);
   board = new Board();
 
-  point1 = new Point(2, 2, 3);
-  point2 = new Point(8, 7, 3);
-  line1 = new Line(point1, point2);
+  p1 = new Point(2, 10, 4);
+  p2 = new Point(15, 6, 7);
+  p3 = new Point(2, 2, 4);
 
-  board.addEvent(() => board.drawPoint(point1, (rad = 8)));
-  board.addEvent(() => board.drawPoint(point2, (rad = 8)));
-  board.addEvent(() => board.drawPoint(line1.getPointUsingZ(0), (rad = 8)));
-  // board.addEvent(() => board.drawSegmentedLine(line1));
+  plane1 = new Plane(p1, p2, p3);
+
+  p4 = new Point(2, 3, 4);
+  p5 = new Point(6, 5, 4);
+
+  line1 = new Line(p4, p5);
+
+  intersection = line1.planeIntersection(plane1);
+
   board.addEvent(() => board.drawLine(line1));
+  // board.addEvent(() => board.drawPoint(intersection));
 }
 
 function draw() {
   background(0);
   board.drawBackground();
-  // board.drawLT();
   board.runEvents();
 }
 

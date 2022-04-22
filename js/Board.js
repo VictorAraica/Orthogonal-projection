@@ -6,6 +6,7 @@ class Board {
   }
 
   test() {}
+  
   runEvents() {
     // run the events in the list
     for (let event of this.events) {
@@ -82,38 +83,50 @@ class Board {
     line(origin.x, origin.y + 15, origin.x, origin.y - 15);
   }
 
-  drawPoint(p, rad = 5, color = 255) {
+  drawPoint(p, rad = 5, color = [255, 255, 255]) {
+    if (typeof p !== "object" || p === null) {
+      return false;
+    }
+
     const PH = this.scaleToPixel(p.x, p.y);
     const PV = this.scaleToPixel(p.x, -p.z);
 
     strokeWeight(rad);
-    stroke(color);
+    stroke(...color);
 
     point(PH);
     point(PV);
   }
 
-  drawSegmentedLine(l, width = 2, color = 255) {
+  drawSegmentedLine(l, width = 2, color = [255, 255, 255]) {
+    if (typeof l !== "object" || l === null) {
+      return false;
+    }
+
     const PH1 = this.scaleToPixel(l.p1.x, l.p1.y);
     const PH2 = this.scaleToPixel(l.p2.x, l.p2.y);
     const PV1 = this.scaleToPixel(l.p1.x, -l.p1.z);
     const PV2 = this.scaleToPixel(l.p2.x, -l.p2.z);
 
     strokeWeight(width);
-    stroke(color);
+    stroke(...color);
 
     line(PH1.x, PH1.y, PH2.x, PH2.y);
     line(PV1.x, PV1.y, PV2.x, PV2.y);
   }
 
-  drawLine(l, width = 2, color = 255) {
+  drawLine(l, width = 2, color = [255, 255, 255]) {
+    if (typeof l !== "object" || l === null) {
+      return false;
+    }
+
     const PH1 = this.scaleToPixel(l.p1.x, l.p1.y);
     const PH2 = this.scaleToPixel(l.p2.x, l.p2.y);
     const PV1 = this.scaleToPixel(l.p1.x, -l.p1.z);
     const PV2 = this.scaleToPixel(l.p2.x, -l.p2.z);
 
     strokeWeight(width);
-    stroke(color);
+    stroke(...color);
 
     line(...this.getLineBorderPoints(PH1, PH2));
     line(...this.getLineBorderPoints(PV1, PV2));
