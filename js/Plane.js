@@ -24,6 +24,7 @@ class Plane {
 
     return new Point(x, y, z);
   }
+
   getPointUsingXZ(x, z) {
     const y =
       (-this.equation.d - this.equation.x * x - this.equation.z * z) /

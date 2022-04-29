@@ -1,8 +1,14 @@
 class Line {
+  // if p2 is a vector it will be taken as the direction vector
   constructor(p1, p2) {
     this.p1 = p1;
-    this.p2 = p2;
-    this.direction = this.p2.vector.sub(this.p1.vector).normalize();
+    if (p2 instanceof Point) {
+      this.p2 = p2;
+      this.direction = this.p2.vector.sub(this.p1.vector).normalize();
+    } else {
+      this.direction = p2;
+      this.p2 = new Point(p1.x + p2.x, p1.y + p2.y, p1.z + p2.z);
+    }
   }
 
   getPointUsingX(x) {
