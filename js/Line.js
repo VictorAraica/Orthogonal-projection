@@ -9,6 +9,21 @@ class Line {
       this.direction = p2;
       this.p2 = new Point(p1.x + p2.x, p1.y + p2.y, p1.z + p2.z);
     }
+
+    let m = (p2.y - p1.y) / (p2.x - p1.x);
+    this.equationY = {
+      a: m,
+      b: -1,
+      c: -m * p1.x + p1.y,
+    };
+
+    m = (p2.z - p1.z) / (p2.x - p1.x);
+    // this.my = m;
+    this.equationZ = {
+      a: m,
+      b: -1,
+      c: -m * p1.x + p1.z,
+    };
   }
 
   getPointUsingX(x) {
@@ -103,5 +118,14 @@ class Line {
     }
 
     return new Point(x, y, z);
+  }
+
+  drawSegmented(board) {
+    board.addEvent(() => board.drawSegmentedLine(this));
+  }
+
+  draw(board) {
+    board.addEvent(() => board.drawLine(this));
+    board.shapes.push(this);
   }
 }

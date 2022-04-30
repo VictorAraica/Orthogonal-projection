@@ -3,10 +3,12 @@ class Board {
     this.cellSize = cellSize;
     this.cameraPos = createVector(1, windowHeight / this.cellSize / 2);
     this.events = [];
+    this.shapes = [];
   }
 
-  test() {}
-  
+  test() {
+  }
+
   runEvents() {
     // run the events in the list
     for (let event of this.events) {
@@ -36,7 +38,7 @@ class Board {
     const scaleX = x / this.cellSize - this.cameraPos.x;
     const scaleY = y / this.cellSize - this.cameraPos.y;
 
-    return createVector(scaleX, scaleY);
+    return createVector(scaleX, scaleY, -scaleY);
   }
 
   scaleToPixel(x, y) {
@@ -83,7 +85,7 @@ class Board {
     line(origin.x, origin.y + 15, origin.x, origin.y - 15);
   }
 
-  drawPoint(p, rad = 5, color = [255, 255, 255]) {
+  drawPoint(p, rad = 7, color = [255, 255, 255]) {
     if (typeof p !== "object" || p === null) {
       return false;
     }
@@ -91,8 +93,13 @@ class Board {
     const PH = this.scaleToPixel(p.x, p.y);
     const PV = this.scaleToPixel(p.x, -p.z);
 
-    strokeWeight(rad);
+    if (this.distanceMousePoint(p) * this.cellSize < 15) {
+      color = [0, 255, 0];
+      rad *= 1.5;
+    }
+
     stroke(...color);
+    strokeWeight(rad);
 
     point(PH);
     point(PV);
@@ -118,6 +125,11 @@ class Board {
   drawLine(l, width = 2, color = [255, 255, 255]) {
     if (typeof l !== "object" || l === null) {
       return false;
+    }
+
+    if (this.distanceMouseLine(l) * this.cellSize < 15) {
+      color = [0, 255, 0];
+      width *= 1.5;
     }
 
     const PH1 = this.scaleToPixel(l.p1.x, l.p1.y);
@@ -146,5 +158,28 @@ class Board {
 
   addEvent(e) {
     this.events.push(e);
+  }
+
+  distanceMousePoint(p) {
+    const mousePos = this.pixelToScale(pmouseX, pmouseY);
+    const distY = Math.sqrt((p.x - mousePos.x) ** 2 + (p.y - mousePos.y) ** 2);
+    const distZ = Math.sqrt((p.x - mousePos.x) ** 2 + (p.z - mousePos.z) ** 2);
+    return Math.min(distY, distZ);
+  }
+
+  distanceMouseLine(l) {
+    const mousePos = this.pixelToScale(pmouseX, pmouseY);
+
+    const distY =
+      Math.abs(
+        l.equationY.a * mousePos.x + l.equationY.b * mousePos.y + l.equationY.c
+      ) / Math.sqrt(l.equationY.a ** 2 + l.equationY.b ** 2);
+
+    const distZ =
+      Math.abs(
+        l.equationZ.a * mousePos.x + l.equationZ.b * mousePos.z + l.equationZ.c
+      ) / Math.sqrt(l.equationZ.a ** 2 + l.equationZ.b ** 2);
+
+    return Math.min(distY, distZ);
   }
 }

@@ -20,4 +20,9 @@ class Point {
       this.vector = args[0];
     }
   }
+
+  draw(board) {
+    board.addEvent(() => board.drawPoint(this));
+    board.shapes.push(this);
+  }
 }
