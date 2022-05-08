@@ -1,5 +1,6 @@
 class Point {
   constructor(...args) {
+    this.type = "point";
     if (
       typeof args[0] === "number" &&
       typeof args[1] === "number" &&
@@ -19,10 +20,9 @@ class Point {
       this.z = args[0].z;
       this.vector = args[0];
     }
-  }
+    this.show = true;
 
-  draw(board) {
-    board.addEvent(() => board.drawPoint(this));
-    board.shapes.push(this);
+    this.rad = 7;
+    this.color = [255, 255, 255];
   }
 }

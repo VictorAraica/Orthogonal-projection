@@ -2,17 +2,36 @@ class Board {
   constructor(cellSize = 43) {
     this.cellSize = cellSize;
     this.cameraPos = createVector(1, windowHeight / this.cellSize / 2);
-    this.events = [];
     this.shapes = [];
   }
 
-  test() {
+  test() {}
+
+  addShape(shape) {
+    this.shapes.push(shape);
   }
 
-  runEvents() {
-    // run the events in the list
-    for (let event of this.events) {
-      event();
+  addShapes(shapes) {
+    this.shapes.push(...shapes);
+  }
+
+  draw(shape) {
+    if (shape.type === "point" && shape.show) {
+      this.drawPoint(shape);
+    } else if (shape.type === "line" && shape.show) {
+      this.drawLine(shape);
+    } else if (shape.type === "segmented line" && shape.show) {
+      this.drawSegmentedLine(shape);
+    }
+    // if (shape.type === "plane") {
+    //  this.drawPlane(shape)
+    // }
+  }
+
+  drawShapes() {
+    // draw shapes in the list
+    for (let shape of this.shapes) {
+      this.draw(shape);
     }
   }
 
@@ -85,7 +104,7 @@ class Board {
     line(origin.x, origin.y + 15, origin.x, origin.y - 15);
   }
 
-  drawPoint(p, rad = 7, color = [255, 255, 255]) {
+  drawPoint(p) {
     if (typeof p !== "object" || p === null) {
       return false;
     }
@@ -93,7 +112,10 @@ class Board {
     const PH = this.scaleToPixel(p.x, p.y);
     const PV = this.scaleToPixel(p.x, -p.z);
 
-    if (this.distanceMousePoint(p) * this.cellSize < 15) {
+    let color = p.color;
+    let rad = p.rad;
+
+    if (this.distanceMousePoint(p) * this.cellSize < 10) {
       color = [0, 255, 0];
       rad *= 1.5;
     }
@@ -105,7 +127,7 @@ class Board {
     point(PV);
   }
 
-  drawSegmentedLine(l, width = 2, color = [255, 255, 255]) {
+  drawSegmentedLine(l) {
     if (typeof l !== "object" || l === null) {
       return false;
     }
@@ -115,6 +137,15 @@ class Board {
     const PV1 = this.scaleToPixel(l.p1.x, -l.p1.z);
     const PV2 = this.scaleToPixel(l.p2.x, -l.p2.z);
 
+    let color = l.color;
+    let width = l.width;
+
+    // const mousePos = this.pixelToScale(pmouseX, pmouseY);
+    // if (this.distanceMousePoint(p) * this.cellSize < 10 && mousePos.x) {
+    //   color = [0, 255, 0];
+    //   rad *= 1.5;
+    // }
+
     strokeWeight(width);
     stroke(...color);
 
@@ -122,14 +153,17 @@ class Board {
     line(PV1.x, PV1.y, PV2.x, PV2.y);
   }
 
-  drawLine(l, width = 2, color = [255, 255, 255]) {
+  drawLine(l) {
     if (typeof l !== "object" || l === null) {
       return false;
     }
 
-    if (this.distanceMouseLine(l) * this.cellSize < 15) {
+    let color = l.color;
+    let width = l.width;
+
+    if (this.distanceMouseLine(l) * this.cellSize < 10) {
       color = [0, 255, 0];
-      width *= 1.5;
+      width *= 2;
     }
 
     const PH1 = this.scaleToPixel(l.p1.x, l.p1.y);
@@ -154,10 +188,6 @@ class Board {
     const y2 = m * windowWidth - m * p1.x + p1.y;
 
     return [0, y1, windowWidth, y2];
-  }
-
-  addEvent(e) {
-    this.events.push(e);
   }
 
   distanceMousePoint(p) {

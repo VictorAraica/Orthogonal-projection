@@ -1,6 +1,7 @@
 class Line {
   // if p2 is a vector it will be taken as the direction vector
   constructor(p1, p2) {
+    this.type = "line";
     this.p1 = p1;
     if (p2 instanceof Point) {
       this.p2 = p2;
@@ -18,12 +19,15 @@ class Line {
     };
 
     m = (p2.z - p1.z) / (p2.x - p1.x);
-    // this.my = m;
     this.equationZ = {
       a: m,
       b: -1,
       c: -m * p1.x + p1.z,
     };
+
+    this.show = true;
+    this.color = [255, 255, 255];
+    this.width = 2;
   }
 
   getPointUsingX(x) {
@@ -118,14 +122,5 @@ class Line {
     }
 
     return new Point(x, y, z);
-  }
-
-  drawSegmented(board) {
-    board.addEvent(() => board.drawSegmentedLine(this));
-  }
-
-  draw(board) {
-    board.addEvent(() => board.drawLine(this));
-    board.shapes.push(this);
   }
 }

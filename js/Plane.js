@@ -1,5 +1,6 @@
 class Plane {
   constructor(p1, p2, p3) {
+    this.type = "plane";
     this.p1 = p1;
     this.p2 = p2;
     this.p3 = p3;
@@ -15,6 +16,10 @@ class Plane {
       z: this.n.z,
       d: -this.n.x * p1.x - this.n.y * p1.y - this.n.z * p1.z,
     };
+
+    this.show = true;
+    this.color = [255, 255, 255];
+    this.rad = 2;
   }
 
   getPointUsingXY(x, y) {
@@ -29,8 +34,6 @@ class Plane {
     const y =
       (-this.equation.d - this.equation.x * x - this.equation.z * z) /
       this.equation.y;
-
-    console.log(y);
 
     return new Point(x, y, z);
   }
