@@ -1,7 +1,7 @@
 class Board {
   constructor(cellSize = 43) {
     this.cellSize = cellSize;
-    this.cameraPos = createVector(1, windowHeight / this.cellSize / 2);
+    this.cameraPos = createVector(10, windowHeight / this.cellSize / 2);
     this.shapes = [];
   }
 
