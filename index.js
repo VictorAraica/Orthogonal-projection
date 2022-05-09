@@ -89,6 +89,13 @@ const onBlur = (e) => {
     return false;
   }
 
+  if (sameNameElem) {
+    const sameNameElemIndex = board.shapes.indexOf(shape);
+    if (index > -1) {
+      board.shapes.splice(sameNameElemIndex, 1); // 2nd parameter means remove one item only
+    }
+  }
+
   inputs[index].shape = shape;
   inputs[index].name = name;
   inputs[index].command = `${name} = (${data.join(", ")})`;
