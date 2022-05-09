@@ -13,18 +13,3 @@ body {
 .material-icons.md-24 { font-size: 24px; }
 .material-icons.md-36 { font-size: 36px; }
 .material-icons.md-48 { font-size: 48px; }
-
-
-/* #controls-container {
-  width: 400px;
-  height: 100%;
-  background-color: white;
-  position: absolute;
-  top: 0;
-  left: 0;
-  border-right: 3px rgb(90,90,90) solid;
-}
-
-.add-icon {
-  font-size: 48px; 
-} */
