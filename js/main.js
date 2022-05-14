@@ -32,7 +32,7 @@ function mouseDragged() {
 }
 
 function mouseClicked() {
-  // board.test(line1);
+  board.test();
 }
 
 function mouseWheel(e) {

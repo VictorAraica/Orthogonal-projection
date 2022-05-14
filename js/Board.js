@@ -5,7 +5,9 @@ class Board {
     this.shapes = [];
   }
 
-  test() {}
+  test() {
+    // console.log(this.shapes);
+  }
 
   addShape(shape) {
     this.shapes.push(shape);
