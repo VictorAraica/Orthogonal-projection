@@ -123,4 +123,14 @@ class Line {
 
     return new Point(x, y, z);
   }
+
+  pointInLine = (p) => {
+    const p2 = this.getPointUsingX(p.x);
+
+    if (p.x === p2.x && p.y === p2.y && p.z === p2.z) {
+      return true;
+    }
+
+    return false;
+  };
 }

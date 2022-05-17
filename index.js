@@ -1,15 +1,17 @@
-let controlsContainer = document.getElementById("controls-container");
+const controlsContainer = document.getElementById("controls-container");
 
 const shapes = ["plane", "line", "segmentedLine", "point"];
 
-let addButton = document.getElementById("add-button");
+const addButton = document.getElementById("add-button");
 
-let inputs = [];
+const inputs = [];
 
-let inputElement = document.createElement("input");
+const inputElement = document.createElement("input");
 inputElement.type = "text";
 inputElement.className =
   "w-full border-b border-gray-600 text-lg p-2 outline-none";
+
+// const commands = ["p1 = 1,2,3", "p2 = 4,5,6", "p3 = 7,8,9", "pl = p1,p2,p3"];
 
 const textToShape = (data, index) => {
   let shape;
@@ -43,6 +45,10 @@ const textToShape = (data, index) => {
       shape2.shape.type === shape3.shape.type &&
       shape1.shape.type === "point"
     ) {
+      let line = new Line(shape1.shape, shape2.shape);
+      if (line.pointInLine(shape3.shape)) {
+        return false;
+      }
       shape = new Plane(shape1.shape, shape2.shape, shape3.shape);
       for (i of [shape1, shape2, shape3]) {
         if (!i.dependencies.includes(index)) {
@@ -75,6 +81,14 @@ const blurError = (element, error) => {
 const updateInput = (index) => {
   element = inputs[index];
   value = element.input.value;
+
+  if (value === "") {
+    element.shape = "";
+    element.name = "";
+    element.command = "";
+    element.input.placeholder = "";
+  }
+
   // split on = and get name and data
   let [name, data] = getNameAndData(value);
   // if no data delete input value and return
@@ -99,7 +113,7 @@ const updateInput = (index) => {
     return false;
   }
 
-  let shape = textToShape(data, index);
+  const shape = textToShape(data, index);
 
   if (!shape) {
     blurError(element, "error");
@@ -112,9 +126,11 @@ const updateInput = (index) => {
       board.shapes.splice(sameNameElemIndex, 1);
     }
   }
+
   element.shape = shape;
   element.name = name;
   element.command = `${name} = (${data.join(", ")})`;
+
   if (element.dependencies.length > 0) {
     for (i of element.dependencies) {
       updateInput(i);
@@ -130,12 +146,22 @@ const onBlur = (e) => {
   updateInput(e.target.index);
 };
 
-addButton.onclick = () => {
+const createInput = (command) => {
   let input = inputElement.cloneNode(true);
   input.onblur = onBlur;
   input.index = inputs.length;
 
   controlsContainer.insertBefore(input, addButton);
-  inputs.push({ input, dependencies: [] });
+  inputs.push({ input, dependencies: [], command: command });
   input.focus();
+
+  return input;
 };
+
+addButton.onclick = () => {
+  createInput("");
+};
+
+// for (command of commands) {
+//   createInput(command);
+// }

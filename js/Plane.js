@@ -5,6 +5,12 @@ class Plane {
     this.p2 = p2;
     this.p3 = p3;
 
+    let line1 = new Line(p1, p2);
+
+    if (line1.pointInLine(p3)) {
+      throw Error;
+    }
+
     let v1 = this.p1.vector.sub(this.p2.vector);
     let v2 = this.p3.vector.sub(this.p2.vector);
 
