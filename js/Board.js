@@ -9,8 +9,10 @@ class Board {
     // console.log(this.shapes);
   }
 
-  addShape(shape) {
-    this.shapes.push(shape);
+  addShape(shape, index) {
+    // console.log(shape);
+    this.shapes.splice(index, 0, shape);
+    // console.log(this.shapes[index]);
   }
 
   addShapes(shapes) {

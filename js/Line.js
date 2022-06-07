@@ -3,13 +3,11 @@ class Line {
   constructor(p1, p2) {
     this.type = "line";
     this.p1 = p1;
-    if (p2 instanceof Point) {
-      this.p2 = p2;
-      this.direction = this.p2.vector.sub(this.p1.vector).normalize();
-    } else {
-      this.direction = p2;
-      this.p2 = new Point(p1.x + p2.x, p1.y + p2.y, p1.z + p2.z);
-    }
+    this.p2 = p2;
+    this.direction = this.p2.vector.copy().sub(this.p1.vector).normalize();
+
+    // console.log(this.p2);
+    // // console.log(this.p1.vector);
 
     let m = (p2.y - p1.y) / (p2.x - p1.x);
     this.equationY = {
@@ -92,9 +90,9 @@ class Line {
     const beta = (p1x + alfa * dir1x - p2x) / dir2x;
 
     if ((p1z + alfa * dir1z).toFixed(2) === (p2z + beta * dir2z).toFixed(2)) {
-      const x = (p1x + alfa * dir1x).toFixed(2);
-      const y = (p1y + alfa * dir1y).toFixed(2);
-      const z = (p1z + alfa * dir1z).toFixed(2);
+      const x = p1x + alfa * dir1x;
+      const y = p1y + alfa * dir1y;
+      const z = p1z + alfa * dir1z;
 
       return new Point(x, y, z);
     }
@@ -113,11 +111,11 @@ class Line {
         plane.equation.z * this.direction.z
       );
 
-    const x = (this.p1.x + alfa * this.direction.x).toFixed(2);
-    const y = (this.p1.y + alfa * this.direction.y).toFixed(2);
-    const z = (this.p1.z + alfa * this.direction.z).toFixed(2);
+    const x = this.p1.x + alfa * this.direction.x;
+    const y = this.p1.y + alfa * this.direction.y;
+    const z = this.p1.z + alfa * this.direction.z;
 
-    if (x == Infinity || y == Infinity || z == Infinity) {
+    if (x === Infinity || y === Infinity || z === Infinity) {
       return false;
     }
 
