@@ -19,12 +19,9 @@ class ControlPanel {
     let commands = [
       "p1 = (1, 3, 3)",
       "p2 = (7.5, 5.5, 5.5)",
-      "p3 = (8, 3, 3)",
-      "1erbisector = (p1, p2, p3)",
+      "line = (p1, p2)",
       "p4 = (10, 10, 5)",
-      "p5 = (10, 10, 3)",
-      "line = (p4, p5)",
-      "interseccion=intersection(line,1erbisector)",
+      "paralela = parallel(line,p4)",
     ];
 
     for (let command of commands) {
@@ -87,6 +84,39 @@ class ControlPanel {
     return shape;
   }
 
+  intersection(index, input1, input2) {
+    let shape;
+    if (input1.shape.type === "line" && input2.shape.type === "line") {
+      shape = input1.shape.lineIntersection(input2.shape);
+    } else if (input1.shape.type === "line" && input2.shape.type === "plane") {
+      shape = input1.shape.planeIntersection(input2.shape);
+    } else if (input1.shape.type === "plane" && input2.shape.type === "line") {
+      shape = input2.shape.planeIntersection(input1.shape);
+    }
+    if (shape) {
+      this.addDependencies(index, [input1, input2]);
+      return shape;
+    }
+    return false;
+  }
+
+  parallel(index, input1, input2) {
+    let shape;
+    if (input1.shape.type === "point" && input2.shape.type === "line") {
+      shape = input2.shape.parallelLine(input1.shape);
+    } else if (input1.shape.type === "line" && input2.shape.type === "point") {
+      shape = input1.shape.parallelLine(input2.shape);
+    }
+    // else if (input1.shape.type === "plane" && input2.shape.type === "plane") {
+    //   shape = input2.shape.planeIntersection(input1.shape);
+    // }
+    if (shape) {
+      this.addDependencies(index, [input1, input2]);
+      return shape;
+    }
+    return false;
+  }
+
   functionToShape(index, functionName, parameters) {
     if (!functionName in this.functions) {
       return false;
@@ -94,27 +124,21 @@ class ControlPanel {
 
     let shape;
 
-    let input1 = this.inputs.find((element) => element.name === parameters[0]);
-    let input2 = this.inputs.find((element) => element.name === parameters[1]);
+    const input1 = this.inputs.find(
+      (element) => element.name === parameters[0]
+    );
+    const input2 = this.inputs.find(
+      (element) => element.name === parameters[1]
+    );
 
     if (functionName === "intersection") {
-      if (input1.shape.type === "line" && input2.shape.type === "line") {
-        shape = input1.shape.lineIntersection(input2.shape);
-      } else if (
-        input1.shape.type === "line" &&
-        input2.shape.type === "plane"
-      ) {
-        shape = input1.shape.planeIntersection(input2.shape);
-      } else if (
-        input1.shape.type === "plane" &&
-        input2.shape.type === "line"
-      ) {
-        shape = input2.shape.planeIntersection(input1.shape);
-      }
-      if (shape) {
-        this.addDependencies(index, [input1, input2]);
-        return shape;
-      }
+      shape = this.intersection(index, input1, input2);
+    } else if (functionName === "parallel") {
+      shape = this.parallel(index, input1, input2);
+    }
+
+    if (shape) {
+      return shape;
     }
 
     return false;
