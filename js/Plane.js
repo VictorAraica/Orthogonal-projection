@@ -11,8 +11,8 @@ class Plane {
       throw Error;
     }
 
-    let v1 = this.p1.vector.sub(this.p2.vector);
-    let v2 = this.p3.vector.sub(this.p2.vector);
+    let v1 = this.p1.vector.copy().sub(this.p2.vector);
+    let v2 = this.p3.vector.copy().sub(this.p2.vector);
 
     this.n = v1.cross(v2);
 

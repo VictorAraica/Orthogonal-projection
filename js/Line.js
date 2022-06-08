@@ -6,9 +6,6 @@ class Line {
     this.p2 = p2;
     this.direction = this.p2.vector.copy().sub(this.p1.vector).normalize();
 
-    // console.log(this.p2);
-    // // console.log(this.p1.vector);
-
     let m = (p2.y - p1.y) / (p2.x - p1.x);
     this.equationY = {
       a: m,

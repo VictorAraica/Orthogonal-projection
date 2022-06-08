@@ -20,8 +20,13 @@ class ControlPanel {
       "p1 = (1, 3, 3)",
       "p2 = (7.5, 5.5, 5.5)",
       "line = (p1, p2)",
-      "p4 = (10, 10, 5)",
-      "paralela = parallel(line,p4)",
+      "p3 = (10, 5, 5)",
+      // "paralela = parallel(line, p3)",
+      "1erBisector = (p1, p2, p3)",
+      // "p4 = (3, 2, 8)",
+      // "p5 = (6, 7, 0)",
+      // "line2 = (p4, p5)",
+      // "interseccion = intersection(line2, 1erBisector)",
     ];
 
     for (let command of commands) {
@@ -29,6 +34,7 @@ class ControlPanel {
     }
 
     for (let i = 0; i < this.inputs.length; i++) {
+      this.inputs[i].input.value = commands[i];
       this.updateInput(i);
     }
   }
