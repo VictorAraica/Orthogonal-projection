@@ -21,12 +21,12 @@ class ControlPanel {
       "p2 = (7.5, 5.5, 5.5)",
       "line = (p1, p2)",
       "p3 = (10, 5, 5)",
-      // "paralela = parallel(line, p3)",
+      "paralela = parallel(line, p3)",
       "1erBisector = (p1, p2, p3)",
-      // "p4 = (3, 2, 8)",
-      // "p5 = (6, 7, 0)",
-      // "line2 = (p4, p5)",
-      // "interseccion = intersection(line2, 1erBisector)",
+      "p4 = (3, 2, 8)",
+      "p5 = (6, 7, 0)",
+      "line2 = (p4, p5)",
+      "interseccion = intersection(line2, 1erBisector)",
     ];
 
     for (let command of commands) {
