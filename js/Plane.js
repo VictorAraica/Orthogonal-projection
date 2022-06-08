@@ -51,4 +51,12 @@ class Plane {
 
     return new Point(x, y, z);
   }
+
+  perpendicularLine(point) {
+    let p2 = point.vector.copy().add(this.n);
+    let x = p2.x;
+    let y = p2.y;
+    let z = p2.z;
+    return new Line(point, new Point(x, y, z));
+  }
 }

@@ -17,16 +17,17 @@ class ControlPanel {
     };
 
     let commands = [
-      "p1 = (1, 3, 3)",
-      "p2 = (7.5, 5.5, 5.5)",
+      "p1 = (0, 0, 0)",
+      "p2 = (8, 7, 0)",
+      // "p3 = (10, 5, 8)",
       "line = (p1, p2)",
-      "p3 = (10, 5, 5)",
-      "paralela = parallel(line, p3)",
-      "1erBisector = (p1, p2, p3)",
-      "p4 = (3, 2, 8)",
-      "p5 = (6, 7, 0)",
-      "line2 = (p4, p5)",
-      "interseccion = intersection(line2, 1erBisector)",
+      // "canto = p1,p2,p3",
+      // "paralela = parallel(line, p3)",
+      // "1erBisector = (p1, p2, p3)",
+      // "p4 = (3, 2, 8)",
+      // "p5 = (6, 7, 0)",
+      // "line2 = (p4, p5)",
+      // "interseccion = intersection(line2, 1erBisector)",
     ];
 
     for (let command of commands) {
@@ -113,9 +114,28 @@ class ControlPanel {
     } else if (input1.shape.type === "line" && input2.shape.type === "point") {
       shape = input1.shape.parallelLine(input2.shape);
     }
+    // TODO
     // else if (input1.shape.type === "plane" && input2.shape.type === "plane") {
     //   shape = input2.shape.planeIntersection(input1.shape);
     // }
+    if (shape) {
+      this.addDependencies(index, [input1, input2]);
+      return shape;
+    }
+    return false;
+  }
+
+  perpendicular(index, input1, input2) {
+    let shape;
+    if (input1.shape.type === "point" && input2.shape.type === "line") {
+      shape = input2.shape.perpendicularLine(input1.shape);
+    } else if (input1.shape.type === "line" && input2.shape.type === "point") {
+      shape = input1.shape.perpendicularLine(input2.shape);
+    } else if (input1.shape.type === "point" && input2.shape.type === "plane") {
+      shape = input2.shape.perpendicularLine(input1.shape);
+    } else if (input1.shape.type === "plane" && input2.shape.type === "point") {
+      shape = input1.shape.perpendicularLine(input2.shape);
+    }
     if (shape) {
       this.addDependencies(index, [input1, input2]);
       return shape;
@@ -141,6 +161,8 @@ class ControlPanel {
       shape = this.intersection(index, input1, input2);
     } else if (functionName === "parallel") {
       shape = this.parallel(index, input1, input2);
+    } else if (functionName === "perpendicular") {
+      shape = this.perpendicular(index, input1, input2);
     }
 
     if (shape) {

@@ -136,4 +136,13 @@ class Line {
     let z = p2.z;
     return new Line(point, new Point(x, y, z));
   }
+
+  perpendicularLine(point) {
+    const a = point.vector.copy().sub(this.p1.vector);
+    const b = this.p2.vector.copy().sub(this.p1.vector);
+
+    const p2 = b.mult(a.copy().dot(b) / b.copy().dot(b));
+
+    return new Line(point, new Point(p2.x, p2.y, p2.z));
+  }
 }
