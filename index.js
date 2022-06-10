@@ -22,8 +22,7 @@ function mouseDragged() {
 }
 
 function mouseClicked() {
-  // board.test();
-  // console.log(controlPanel.board.shapes[6]);
+  board.test();
 }
 
 function mouseWheel(e) {

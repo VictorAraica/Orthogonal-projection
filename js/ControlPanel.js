@@ -12,7 +12,12 @@ class ControlPanel {
     this.inputElement.className = "w-full text-lg p-2 outline-none";
 
     this.inputContainer = document.createElement("div");
-    this.inputContainer.className = "border-b border-gray-600";
+    this.inputContainer.className =
+      "border-b border-gray-600 flex justify-center content-center items-center";
+
+    this.inputVisibilityElement = document.createElement("div");
+    this.inputVisibilityElement.className =
+      "rounded-full border-2 border-black bg-black w-5 h-5 m-2 cursor-pointer bg-opacity-70";
 
     this.addButton.onclick = () => {
       this.createInput("");
@@ -39,6 +44,22 @@ class ControlPanel {
     for (let i = 0; i < this.inputs.length; i++) {
       this.inputs[i].input.value = commands[i];
       this.updateInput(i);
+    }
+  }
+
+  visibilityToggle(e, index) {
+    if (this.inputs[index].shape.show) {
+      this.inputs[index].shape.show = false;
+      e.target.className = e.target.className.replace(
+        "bg-opacity-70",
+        "bg-opacity-10"
+      );
+    } else {
+      this.inputs[index].shape.show = true;
+      e.target.className = e.target.className.replace(
+        "bg-opacity-10",
+        "bg-opacity-70"
+      );
     }
   }
 
@@ -320,10 +341,17 @@ class ControlPanel {
   createInput(command) {
     let input = this.inputElement.cloneNode(true);
     let inputContainer = this.inputContainer.cloneNode(true);
+    let inputVisibilityElement = this.inputVisibilityElement.cloneNode(true);
     // input.addEventListener("focus", () => console.log("focus"));
     input.addEventListener("blur", (e) => this.updateInput(e.target.index));
     input.index = this.inputs.length;
 
+    inputVisibilityElement.index = this.inputs.length;
+    inputVisibilityElement.addEventListener("click", (e) =>
+      this.visibilityToggle(e, input.index)
+    );
+
+    inputContainer.appendChild(inputVisibilityElement);
     inputContainer.appendChild(input);
 
     this.controlsContainer.insertBefore(inputContainer, this.addButton);
