@@ -4,13 +4,15 @@ class ControlPanel {
     this.addButton = addButton;
     // this.shapes = ["plane", "line", "segmentedLine", "point"];
     this.inputs = [];
-    this.functions = ["intersection", "parallel", "perpendicular"];
+    this.functions = ["intersection", "parallel", "perpendicular", "segment"];
     this.board = board;
 
     this.inputElement = document.createElement("input");
     this.inputElement.type = "text";
-    this.inputElement.className =
-      "w-full border-b border-gray-600 text-lg p-2 outline-none";
+    this.inputElement.className = "w-full text-lg p-2 outline-none";
+
+    this.inputContainer = document.createElement("div");
+    this.inputContainer.className = "border-b border-gray-600";
 
     this.addButton.onclick = () => {
       this.createInput("");
@@ -61,6 +63,10 @@ class ControlPanel {
       const shape1 = this.inputs.find((element) => element.name === data[0]);
       const shape2 = this.inputs.find((element) => element.name === data[1]);
 
+      if (!shape1 || !shape2) {
+        return false;
+      }
+
       // if two points create line
       if (shape1.shape.type === "point" && shape2.shape.type === "point") {
         shape = new Line(shape1.shape, shape2.shape);
@@ -71,6 +77,10 @@ class ControlPanel {
       const shape1 = this.inputs.find((element) => element.name === data[0]);
       const shape2 = this.inputs.find((element) => element.name === data[1]);
       const shape3 = this.inputs.find((element) => element.name === data[2]);
+
+      if (!shape1 || !shape2 || !shape3) {
+        return false;
+      }
 
       // if 3 points create plane
       if (
@@ -87,6 +97,7 @@ class ControlPanel {
         this.addDependencies(index, [shape1, shape2, shape3]);
       }
     }
+    if (!shape) return false;
 
     return shape;
   }
@@ -143,6 +154,18 @@ class ControlPanel {
     return false;
   }
 
+  segmentedLine(index, input1, input2) {
+    let shape;
+    if (input1.shape.type === "point" && input2.shape.type === "point") {
+      shape = new SegmentedLine(input1.shape, input2.shape);
+    }
+    if (shape) {
+      this.addDependencies(index, [input1, input2]);
+      return shape;
+    }
+    return false;
+  }
+
   functionToShape(index, functionName, parameters) {
     if (!functionName in this.functions) {
       return false;
@@ -157,12 +180,18 @@ class ControlPanel {
       (element) => element.name === parameters[1]
     );
 
+    if (!input1 || !input2) {
+      return false;
+    }
+
     if (functionName === "intersection") {
       shape = this.intersection(index, input1, input2);
     } else if (functionName === "parallel") {
       shape = this.parallel(index, input1, input2);
     } else if (functionName === "perpendicular") {
       shape = this.perpendicular(index, input1, input2);
+    } else if (functionName === "segment") {
+      shape = this.segmentedLine(index, input1, input2);
     }
 
     if (shape) {
@@ -185,7 +214,8 @@ class ControlPanel {
   }
 
   blurError(element, error) {
-    element.input.value = element.command ? element.command : "";
+    this.board.shapes[element.input.index] = false;
+    element.input.value = "";
     element.input.placeholder = error;
   }
 
@@ -193,12 +223,20 @@ class ControlPanel {
     let element = this.inputs[index];
     let value = element.input.value;
 
-    // if (value === "") {
-    //   element.shape = "";
-    //   element.name = "";
-    //   element.command = "";
-    //   element.input.placeholder = "";
-    // }
+    if (value === "") {
+      element.shape = "";
+      element.name = "";
+      element.command = "";
+      element.input.placeholder = "";
+      this.board.shapes[index] = false;
+      element.shape = false;
+      if (element.dependencies) {
+        for (let i of element.dependencies) {
+          this.updateInput(i);
+        }
+      }
+      element.dependencies = [];
+    }
 
     // ---------------------------------------------
 
@@ -281,11 +319,14 @@ class ControlPanel {
 
   createInput(command) {
     let input = this.inputElement.cloneNode(true);
+    let inputContainer = this.inputContainer.cloneNode(true);
     // input.addEventListener("focus", () => console.log("focus"));
     input.addEventListener("blur", (e) => this.updateInput(e.target.index));
     input.index = this.inputs.length;
 
-    this.controlsContainer.insertBefore(input, this.addButton);
+    inputContainer.appendChild(input);
+
+    this.controlsContainer.insertBefore(inputContainer, this.addButton);
     this.inputs.push({ input, dependencies: [], command: command });
     input.focus();
 
