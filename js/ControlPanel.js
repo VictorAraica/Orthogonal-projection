@@ -2,7 +2,6 @@ class ControlPanel {
   constructor(controlsContainer, addButton, board) {
     this.controlsContainer = controlsContainer;
     this.addButton = addButton;
-    // this.shapes = ["plane", "line", "segmentedLine", "point"];
     this.inputs = [];
     this.functions = [
       "intersection",
@@ -12,6 +11,8 @@ class ControlPanel {
       "perpendicularPlane",
     ];
     this.board = board;
+
+    this.board.xLimit = controlsContainer.offsetWidth;
 
     this.inputElement = document.createElement("input");
     this.inputElement.type = "text";

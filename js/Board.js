@@ -3,10 +3,10 @@ class Board {
     this.cellSize = cellSize;
     this.cameraPos = createVector(10, windowHeight / this.cellSize / 2);
     this.shapes = [];
+    this.xLimit = 0;
   }
 
-  test() {
-  }
+  test() {}
 
   addShape(shape, index) {
     this.shapes.splice(index, 0, shape);
@@ -38,11 +38,12 @@ class Board {
 
   moveCameraPos() {
     // move the camera depending on the mouse drag
-    const dif = this.pixelToScale(mouseX, mouseY).sub(
-      this.pixelToScale(pmouseX, pmouseY)
-    );
-
-    this.cameraPos.add(dif);
+    if (mouseX > this.xLimit) {
+      const dif = this.pixelToScale(mouseX, mouseY).sub(
+        this.pixelToScale(pmouseX, pmouseY)
+      );
+      this.cameraPos.add(dif);
+    }
   }
 
   zoom(e) {

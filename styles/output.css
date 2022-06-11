@@ -737,6 +737,10 @@ Ensure the default browser behavior of the `hidden` attribute.
   min-height: 100vh;
 }
 
+.min-h-full {
+  min-height: 100%;
+}
+
 .w-96 {
   width: 24rem;
 }
@@ -759,6 +763,10 @@ Ensure the default browser behavior of the `hidden` attribute.
 
 .shrink {
   flex-shrink: 1;
+}
+
+.shrink-0 {
+  flex-shrink: 0;
 }
 
 .flex-grow {
