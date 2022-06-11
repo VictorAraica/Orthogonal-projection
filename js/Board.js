@@ -4,6 +4,7 @@ class Board {
     this.cameraPos = createVector(10, windowHeight / this.cellSize / 2);
     this.shapes = [];
     this.xLimit = 0;
+    this.WEBGL = true;
   }
 
   test() {}
@@ -51,6 +52,9 @@ class Board {
       this.cellSize *= 0.9;
     } else {
       this.cellSize *= 1.1;
+      if (this.cellSize < 18) {
+        this.cellSize = 18;
+      }
     }
   }
 

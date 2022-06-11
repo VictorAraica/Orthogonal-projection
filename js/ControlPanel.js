@@ -155,6 +155,8 @@ class ControlPanel {
       shape = input1.shape.parallelLine(input2.shape);
     }
     // TODO
+    // Plano paralelo
+    // TODO
     // else if (input1.shape.type === "plane" && input2.shape.type === "plane") {
     //   shape = input2.shape.planeIntersection(input1.shape);
     // }
