@@ -4,7 +4,13 @@ class ControlPanel {
     this.addButton = addButton;
     // this.shapes = ["plane", "line", "segmentedLine", "point"];
     this.inputs = [];
-    this.functions = ["intersection", "parallel", "perpendicular", "segment"];
+    this.functions = [
+      "intersection",
+      "parallel",
+      "perpendicularLine",
+      "segment",
+      "perpendicularPlane",
+    ];
     this.board = board;
 
     this.inputElement = document.createElement("input");
@@ -24,9 +30,9 @@ class ControlPanel {
     };
 
     let commands = [
-      "p1 = (0, 0, 0)",
-      "p2 = (8, 7, 0)",
-      // "p3 = (10, 5, 8)",
+      "p1 = (0, 3, 2)",
+      "p2 = (8, 3, 9)",
+      "p3 = (10, 5, 5)",
       "line = (p1, p2)",
       // "canto = p1,p2,p3",
       // "paralela = parallel(line, p3)",
@@ -48,6 +54,7 @@ class ControlPanel {
   }
 
   visibilityToggle(e, index) {
+    console.log(this.inputs[index].shape);
     if (this.inputs[index].shape.show) {
       this.inputs[index].shape.show = false;
       e.target.className = e.target.className.replace(
@@ -157,7 +164,7 @@ class ControlPanel {
     return false;
   }
 
-  perpendicular(index, input1, input2) {
+  perpendicularLine(index, input1, input2) {
     let shape;
     if (input1.shape.type === "point" && input2.shape.type === "line") {
       shape = input2.shape.perpendicularLine(input1.shape);
@@ -168,6 +175,21 @@ class ControlPanel {
     } else if (input1.shape.type === "plane" && input2.shape.type === "point") {
       shape = input1.shape.perpendicularLine(input2.shape);
     }
+    if (shape) {
+      this.addDependencies(index, [input1, input2]);
+      return shape;
+    }
+    return false;
+  }
+
+  perpendicularPlane(index, input1, input2) {
+    let shape;
+    if (input1.shape.type === "point" && input2.shape.type === "line") {
+      shape = input2.shape.perpendicularPlane(input1.shape);
+    } else if (input1.shape.type === "line" && input2.shape.type === "point") {
+      shape = input1.shape.perpendicularPlane(input2.shape);
+    }
+    console.log(shape);
     if (shape) {
       this.addDependencies(index, [input1, input2]);
       return shape;
@@ -209,8 +231,10 @@ class ControlPanel {
       shape = this.intersection(index, input1, input2);
     } else if (functionName === "parallel") {
       shape = this.parallel(index, input1, input2);
-    } else if (functionName === "perpendicular") {
-      shape = this.perpendicular(index, input1, input2);
+    } else if (functionName === "perpendicularLine") {
+      shape = this.perpendicularLine(index, input1, input2);
+    } else if (functionName === "perpendicularPlane") {
+      shape = this.perpendicularPlane(index, input1, input2);
     } else if (functionName === "segment") {
       shape = this.segmentedLine(index, input1, input2);
     }

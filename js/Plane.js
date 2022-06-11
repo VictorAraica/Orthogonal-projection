@@ -1,20 +1,22 @@
 class Plane {
-  constructor(p1, p2, p3) {
+  constructor(p1, p2, p3 = 0) {
     this.type = "plane";
-    this.p1 = p1;
-    this.p2 = p2;
-    this.p3 = p3;
+    if (p1.type === point && p2.type === "point" && p3.type === point) {
+      this.p1 = p1;
+      this.p2 = p2;
+      this.p3 = p3;
+      let line1 = new Line(p1, p2);
+      if (line1.pointInLine(p3)) {
+        throw Error;
+      }
 
-    let line1 = new Line(p1, p2);
-
-    if (line1.pointInLine(p3)) {
-      throw Error;
+      let v1 = this.p1.vector.copy().sub(this.p2.vector);
+      let v2 = this.p3.vector.copy().sub(this.p2.vector);
+      this.n = v1.cross(v2);
+    } else if (p1.type === "point" && (p2.x || p2.y || p2.z)) {
+      this.n = p2;
+      this.p1 = p1;
     }
-
-    let v1 = this.p1.vector.copy().sub(this.p2.vector);
-    let v2 = this.p3.vector.copy().sub(this.p2.vector);
-
-    this.n = v1.cross(v2);
 
     this.equation = {
       x: this.n.x,

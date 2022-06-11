@@ -4,7 +4,7 @@ class Line {
     this.type = "line";
     this.p1 = p1;
     this.p2 = p2;
-    this.direction = this.p2.vector.copy().sub(this.p1.vector).normalize();
+    this.direction = this.p2.vector.copy().sub(this.p1.vector);
 
     let m = (p2.y - p1.y) / (p2.x - p1.x);
     this.equationY = {
@@ -144,5 +144,10 @@ class Line {
     const p2 = b.mult(a.copy().dot(b) / b.copy().dot(b));
 
     return new Line(point, new Point(p2.x, p2.y, p2.z));
+  }
+
+  // TODO
+  perpendicularPlane(point) {
+    return new Plane(point, this.direction);
   }
 }
