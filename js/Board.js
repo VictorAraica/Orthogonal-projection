@@ -5,7 +5,7 @@ class Board {
     this.cameraPos = createVector(8, windowHeight / this.cellSize / 2);
     this.shapes = [];
     this.xLimit = 0;
-    this.WEBGL = true;
+    this.WEBGL = false;
     this.rotateXWEBGL = 0;
     this.rotateYWEBGL = 0;
     this.translateXWEBGL =
@@ -414,7 +414,9 @@ class Board {
       p.p1.y * this.cellSizeWEBGL
     );
 
-    rotate(angle, rotationAxis2);
+    if (rotationAxis.x !== 0 || rotationAxis.y !== 0 || rotationAxis.z !== 0) {
+      rotate(-angle, rotationAxis2);
+    }
 
     plane(this.cellSizeWEBGL * 20, this.cellSizeWEBGL * 20);
     pop();
