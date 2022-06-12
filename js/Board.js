@@ -408,8 +408,6 @@ class Board {
       rotationAxis.y
     );
 
-    console.log(angle);
-
     translate(
       p.p1.x * this.cellSizeWEBGL,
       -p.p1.z * this.cellSizeWEBGL,
