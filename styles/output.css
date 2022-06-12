@@ -577,10 +577,6 @@ Ensure the default browser behavior of the `hidden` attribute.
   left: 0px;
 }
 
-.bottom-0 {
-  bottom: 0px;
-}
-
 .right-0 {
   right: 0px;
 }
@@ -621,16 +617,12 @@ Ensure the default browser behavior of the `hidden` attribute.
   clear: none;
 }
 
-.m-2 {
-  margin: 0.5rem;
-}
-
-.m-6 {
-  margin: 1.5rem;
-}
-
 .m-4 {
   margin: 1rem;
+}
+
+.m-2 {
+  margin: 0.5rem;
 }
 
 .mt-2 {
@@ -729,6 +721,10 @@ Ensure the default browser behavior of the `hidden` attribute.
   display: none;
 }
 
+.h-screen {
+  height: 100vh;
+}
+
 .h-5 {
   height: 1.25rem;
 }
@@ -741,8 +737,8 @@ Ensure the default browser behavior of the `hidden` attribute.
   height: calc(100% - 0.25rem);
 }
 
-.min-h-full {
-  min-height: 100%;
+.max-h-screen {
+  max-height: 100vh;
 }
 
 .w-96 {
@@ -1510,20 +1506,16 @@ Ensure the default browser behavior of the `hidden` attribute.
   word-break: break-all;
 }
 
+.rounded-md {
+  border-radius: 0.375rem;
+}
+
 .rounded-full {
   border-radius: 9999px;
 }
 
 .rounded {
   border-radius: 0.25rem;
-}
-
-.rounded-sm {
-  border-radius: 0.125rem;
-}
-
-.rounded-md {
-  border-radius: 0.375rem;
 }
 
 .rounded-t {
@@ -1865,18 +1857,14 @@ Ensure the default browser behavior of the `hidden` attribute.
   font-family: "some font",sans-serif;
 }
 
-.text-lg {
-  font-size: 1.125rem;
-  line-height: 1.75rem;
-}
-
 .text-3xl {
   font-size: 1.875rem;
   line-height: 2.25rem;
 }
 
-.font-bold {
-  font-weight: 700;
+.text-lg {
+  font-size: 1.125rem;
+  line-height: 1.75rem;
 }
 
 .font-semibold {
@@ -1954,11 +1942,6 @@ Ensure the default browser behavior of the `hidden` attribute.
 .text-neutral-400 {
   --tw-text-opacity: 1;
   color: rgb(163 163 163 / var(--tw-text-opacity));
-}
-
-.text-white {
-  --tw-text-opacity: 1;
-  color: rgb(255 255 255 / var(--tw-text-opacity));
 }
 
 .text-black {

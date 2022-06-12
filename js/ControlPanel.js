@@ -31,17 +31,26 @@ class ControlPanel {
     };
 
     let commands = [
-      "p1 = (0, 3, 2)",
-      "p2 = (8, 3, 9)",
-      "p3 = (10, 5, 5)",
-      "line = (p1, p2)",
-      // "canto = p1,p2,p3",
-      // "paralela = parallel(line, p3)",
-      // "1erBisector = (p1, p2, p3)",
-      // "p4 = (3, 2, 8)",
-      // "p5 = (6, 7, 0)",
-      // "line2 = (p4, p5)",
-      // "interseccion = intersection(line2, 1erBisector)",
+      "p1 = (3, 3, 3)",
+      "p2 = (4, 3, 3)",
+      "p3 = (3, 4, 3)",
+      "p4 = (3, 3, 4)",
+      "p5 = (3, 4, 4)",
+      "p6 = (4, 4, 4)",
+      "p7 = (4, 3, 4)",
+      "p8 = (4, 4, 3)",
+      "l1 = segment(p1, p2)",
+      "l2 = segment(p1, p3)",
+      "l3 = segment(p3, p5)",
+      "l4 = segment(p1, p4)",
+      "l5 = segment(p2, p7)",
+      "l6 = segment(p2, p8)",
+      "l7 = segment(p3, p8)",
+      "l9 = segment(p4, p5)",
+      "l10 = segment(p4, p7)",
+      "l11 = segment(p5, p6)",
+      "l12 = segment(p6, p7)",
+      "l13 = segment(p6, p8)",
     ];
 
     for (let command of commands) {
@@ -55,7 +64,6 @@ class ControlPanel {
   }
 
   visibilityToggle(e, index) {
-    console.log(this.inputs[index].shape);
     if (this.inputs[index].shape.show) {
       this.inputs[index].shape.show = false;
       e.target.className = e.target.className.replace(
@@ -81,6 +89,7 @@ class ControlPanel {
 
   textToShape(data, index) {
     let shape;
+
     // if 3 numbers create point
     if (data.length === 3 && data.every((i) => !isNaN(i))) {
       shape = new Point(
@@ -106,7 +115,6 @@ class ControlPanel {
       const shape1 = this.inputs.find((element) => element.name === data[0]);
       const shape2 = this.inputs.find((element) => element.name === data[1]);
       const shape3 = this.inputs.find((element) => element.name === data[2]);
-
       if (!shape1 || !shape2 || !shape3) {
         return false;
       }
@@ -133,6 +141,7 @@ class ControlPanel {
 
   intersection(index, input1, input2) {
     let shape;
+
     if (input1.shape.type === "line" && input2.shape.type === "line") {
       shape = input1.shape.lineIntersection(input2.shape);
     } else if (input1.shape.type === "line" && input2.shape.type === "plane") {
@@ -140,6 +149,7 @@ class ControlPanel {
     } else if (input1.shape.type === "plane" && input2.shape.type === "line") {
       shape = input2.shape.planeIntersection(input1.shape);
     }
+    // TODO interseccion plano plano
     if (shape) {
       this.addDependencies(index, [input1, input2]);
       return shape;
@@ -153,9 +163,11 @@ class ControlPanel {
       shape = input2.shape.parallelLine(input1.shape);
     } else if (input1.shape.type === "line" && input2.shape.type === "point") {
       shape = input1.shape.parallelLine(input2.shape);
+    } else if (input1.shape.type === "plane" && input2.shape.type === "point") {
+      shape = input1.shape.parallelPlane(input2.shape);
+    } else if (input1.shape.type === "point" && input2.shape.type === "plane") {
+      shape = input2.shape.parallelPlane(input1.shape);
     }
-    // TODO
-    // Plano paralelo
     // TODO
     // else if (input1.shape.type === "plane" && input2.shape.type === "plane") {
     //   shape = input2.shape.planeIntersection(input1.shape);
@@ -192,7 +204,6 @@ class ControlPanel {
     } else if (input1.shape.type === "line" && input2.shape.type === "point") {
       shape = input1.shape.perpendicularPlane(input2.shape);
     }
-    console.log(shape);
     if (shape) {
       this.addDependencies(index, [input1, input2]);
       return shape;

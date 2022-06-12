@@ -20,25 +20,39 @@ function setup() {
 }
 
 function draw() {
-  // rotate(rotateAngle, createVector(1, 1, 0));
-  // rotateAngle += 0.01;
   background(15);
   if (!board.WEBGL) {
+    ortho();
     translate(-windowWidth / 2, -windowHeight / 2);
     board.drawBackground();
     board.drawShapes();
     board.xLimit = controlsContainer.offsetWidth;
   } else {
-    camera();
-    translate(controlsContainer.offsetWidth / 2, 0);
-    stroke(255);
-    line(-50, 0, 0, 50, 0, 0);
+    if (board.orthoWEBGL) {
+      ortho();
+    }
+
+    translate(
+      board.translateXWEBGL,
+      board.translateYWEBGL,
+      board.translateZWEBGL
+    );
+
+    rotateX(board.rotateXWEBGL);
+    rotateY(board.rotateYWEBGL);
+
+    board.drawAxisWEBGL();
+    board.drawShapes();
+    board.drawPH();
+    board.drawPV();
   }
 }
 
-function mouseDragged() {
+function mouseDragged(e) {
   if (!board.WEBGL) {
     board.moveCameraPos();
+  } else {
+    board.moveCameraPosWEBGL(e);
   }
 }
 
@@ -50,6 +64,8 @@ function mouseClicked() {
 function mouseWheel(e) {
   if (!board.WEBGL) {
     board.zoom(e);
+  } else {
+    board.zoomWEBGL(e);
   }
 }
 
