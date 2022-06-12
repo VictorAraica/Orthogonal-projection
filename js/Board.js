@@ -398,8 +398,8 @@ class Board {
   drawPlaneWEBGL(p) {
     push();
     strokeWeight(0);
-    fill(255, 255, 255, 150);
-    const angle = p.n.angleBetween(createVector(0, 1, 0));
+    fill(130, 130, 130, 150);
+    let angle = p.n.angleBetween(createVector(0, 1, 0));
     const rotationAxis = p.n.copy().cross(createVector(0, 1, 0));
 
     let rotationAxis2 = createVector(
@@ -408,14 +408,20 @@ class Board {
       rotationAxis.y
     );
 
+    console.log(angle);
+
     translate(
       p.p1.x * this.cellSizeWEBGL,
       -p.p1.z * this.cellSizeWEBGL,
       p.p1.y * this.cellSizeWEBGL
     );
 
+    if (angle > 0) {
+      angle = -angle;
+    }
+
     if (rotationAxis.x !== 0 || rotationAxis.y !== 0 || rotationAxis.z !== 0) {
-      rotate(-angle, rotationAxis2);
+      rotate(angle, rotationAxis2);
     }
 
     plane(this.cellSizeWEBGL * 20, this.cellSizeWEBGL * 20);
