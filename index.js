@@ -1,6 +1,5 @@
 let board;
 let controlPanel;
-let rotateAngle = 0;
 
 const controlsContainer = document.getElementById("controls-container");
 
