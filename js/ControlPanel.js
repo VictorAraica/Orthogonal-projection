@@ -30,19 +30,7 @@ class ControlPanel {
       this.createInput("");
     };
 
-    let commands = [
-      "p1 = (0, 3, 2)",
-      "p2 = (8, 3, 9)",
-      "p3 = (10, 5, 5)",
-      "line = (p1, p2)",
-      // "canto = p1,p2,p3",
-      // "paralela = parallel(line, p3)",
-      // "1erBisector = (p1, p2, p3)",
-      // "p4 = (3, 2, 8)",
-      // "p5 = (6, 7, 0)",
-      // "line2 = (p4, p5)",
-      // "interseccion = intersection(line2, 1erBisector)",
-    ];
+    let commands = [];
 
     for (let command of commands) {
       this.createInput(command);
@@ -55,7 +43,6 @@ class ControlPanel {
   }
 
   visibilityToggle(e, index) {
-    console.log(this.inputs[index].shape);
     if (this.inputs[index].shape.show) {
       this.inputs[index].shape.show = false;
       e.target.className = e.target.className.replace(
@@ -190,7 +177,6 @@ class ControlPanel {
     } else if (input1.shape.type === "line" && input2.shape.type === "point") {
       shape = input1.shape.perpendicularPlane(input2.shape);
     }
-    console.log(shape);
     if (shape) {
       this.addDependencies(index, [input1, input2]);
       return shape;
