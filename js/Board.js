@@ -1,9 +1,18 @@
 class Board {
-  constructor(cellSize = 43) {
+  constructor(cellSize = 52) {
     this.cellSize = cellSize;
-    this.cameraPos = createVector(10, windowHeight / this.cellSize / 2);
+    this.cellSizeWEBGL = cellSize;
+    this.cameraPos = createVector(8, windowHeight / this.cellSize / 2);
     this.shapes = [];
     this.xLimit = 0;
+    this.WEBGL = true;
+    this.rotateXWEBGL = 0;
+    this.rotateYWEBGL = 0;
+    this.translateXWEBGL =
+      -windowWidth / 2 + controlsContainer.offsetWidth + windowWidth * 0.1;
+    this.translateYWEBGL = windowHeight / 4;
+    this.translateZWEBGL = 0;
+    this.orthoWEBGL = false;
   }
 
   test() {}
@@ -24,15 +33,28 @@ class Board {
     } else if (shape.type === "segmented line" && shape.show) {
       this.drawSegmentedLine(shape);
     }
-    // if (shape.type === "plane") {
-    //  this.drawPlane(shape)
-    // }
+  }
+
+  drawWEBGL(shape) {
+    if (shape.type === "point" && shape.show) {
+      this.drawPointWEBGL(shape);
+    } else if (shape.type === "line" && shape.show) {
+      this.drawLineWEBGL(shape);
+    } else if (shape.type === "segmented line" && shape.show) {
+      this.drawSegmentedLineWEBGL(shape);
+    } else if (shape.type === "plane" && shape.show) {
+      this.drawPlaneWEBGL(shape);
+    }
   }
 
   drawShapes() {
     // draw shapes in the list
     for (let shape of this.shapes) {
-      this.draw(shape);
+      if (this.WEBGL) {
+        this.drawWEBGL(shape);
+      } else {
+        this.draw(shape);
+      }
     }
   }
 
@@ -46,11 +68,50 @@ class Board {
     }
   }
 
+  moveCameraPosWEBGL(e) {
+    // move the camera depending on the mouse drag
+    if (mouseX > this.xLimit) {
+      const difX = mouseX - pmouseX;
+      const difY = mouseY - pmouseY;
+      if (e.ctrlKey) {
+        this.translateXWEBGL += difX;
+        this.translateYWEBGL += difY;
+      } else {
+        this.rotateYWEBGL += difX * 0.001;
+        this.rotateXWEBGL -= difY * 0.001;
+      }
+    }
+  }
+
   zoom(e) {
-    if (e.deltaY > 0) {
-      this.cellSize *= 0.9;
-    } else {
-      this.cellSize *= 1.1;
+    if (mouseX > this.xLimit) {
+      if (e.deltaY > 0) {
+        this.cellSize *= 0.9;
+        if (this.cellSize < 18) {
+          this.cellSize = 18;
+        }
+      } else {
+        this.cellSize *= 1.1;
+      }
+    }
+  }
+
+  zoomWEBGL(e) {
+    if (mouseX > this.xLimit) {
+      if (e.ctrlKey) {
+        e.preventDefault();
+        if (e.deltaY > 0) {
+          this.translateZWEBGL -= this.cellSizeWEBGL;
+        } else {
+          this.translateZWEBGL += this.cellSizeWEBGL;
+        }
+      } else {
+        if (e.deltaY > 0) {
+          this.cellSizeWEBGL *= 0.9;
+        } else {
+          this.cellSizeWEBGL *= 1.1;
+        }
+      }
     }
   }
 
@@ -142,11 +203,20 @@ class Board {
     let color = l.color;
     let width = l.width;
 
-    // const mousePos = this.pixelToScale(pmouseX, pmouseY);
-    // if (this.distanceMousePoint(p) * this.cellSize < 10 && mousePos.x) {
-    //   color = [0, 255, 0];
-    //   rad *= 1.5;
-    // }
+    const mousePos = this.pixelToScale(pmouseX, pmouseY);
+    // console.log(mousePos.x);
+
+    const p1 = l.p1;
+    const p2 = l.p2;
+
+    if (
+      this.distanceMouseLine(l) * this.cellSize < 10 &&
+      ((p1.x < mousePos.x && mousePos.x < p2.x) ||
+        (p2.x < mousePos.x && mousePos.x < p1.x))
+    ) {
+      color = [0, 255, 0];
+      width *= 2;
+    }
 
     strokeWeight(width);
     stroke(...color);
@@ -213,5 +283,140 @@ class Board {
       ) / Math.sqrt(l.equationZ.a ** 2 + l.equationZ.b ** 2);
 
     return Math.min(distY, distZ);
+  }
+
+  drawPointWEBGL(p) {
+    if (typeof p !== "object" || p === null) {
+      return false;
+    }
+
+    const x = p.x * this.cellSizeWEBGL;
+    // y = z becaus in webgl y is the cota and up is negative
+    const y = -p.z * this.cellSizeWEBGL;
+    const z = p.y * this.cellSizeWEBGL;
+
+    let color = p.color;
+    let rad = p.rad;
+
+    stroke(...color);
+    strokeWeight(rad);
+
+    point(x, y, z);
+  }
+
+  drawLineWEBGL(l) {
+    if (typeof l !== "object" || l === null) {
+      return false;
+    }
+
+    let color = l.color;
+    let width = l.width;
+
+    const x1 = l.p1.x * this.cellSizeWEBGL;
+    // y = z becaus in webgl y is the cota and up is negative
+    const y1 = -l.p1.z * this.cellSizeWEBGL;
+    const z1 = l.p1.y * this.cellSizeWEBGL;
+
+    const x2 = l.p2.x * this.cellSizeWEBGL;
+    // y = z becaus in webgl y is the cota and up is negative
+    const y2 = -l.p2.z * this.cellSizeWEBGL;
+    const z2 = l.p2.y * this.cellSizeWEBGL;
+    2;
+
+    strokeWeight(width);
+    stroke(...color);
+
+    line(x1, y1, z1, x2, y2, z2);
+  }
+
+  drawSegmentedLineWEBGL(l) {
+    if (typeof l !== "object" || l === null) {
+      return false;
+    }
+
+    let color = l.color;
+    let width = l.width;
+
+    const x1 = l.p1.x * this.cellSizeWEBGL;
+    // y = z becaus in webgl y is the cota and up is negative
+    const y1 = -l.p1.z * this.cellSizeWEBGL;
+    const z1 = l.p1.y * this.cellSizeWEBGL;
+
+    const x2 = l.p2.x * this.cellSizeWEBGL;
+    // y = z becaus in webgl y is the cota and up is negative
+    const y2 = -l.p2.z * this.cellSizeWEBGL;
+    const z2 = l.p2.y * this.cellSizeWEBGL;
+    2;
+
+    strokeWeight(width);
+    stroke(...color);
+
+    line(x1, y1, z1, x2, y2, z2);
+  }
+
+  drawPV() {
+    push();
+    const planeWidth = windowHeight * 0.07 + windowWidth / 2;
+    const planeHeight = windowHeight * 0.57;
+    translate(
+      planeWidth / 2 - windowHeight * 0.07,
+      -planeHeight / 2 + windowHeight * 0.07
+    );
+    strokeWeight(0);
+    fill(80, 80, 80, 150);
+    plane(planeWidth, planeHeight);
+    pop();
+  }
+
+  drawPH() {
+    push();
+    const planeWidth = windowHeight * 0.07 + windowWidth / 2;
+    const planeHeight = windowHeight * 0.57;
+    strokeWeight(0);
+    fill(80, 80, 80, 150);
+    rotateX(PI / 2);
+    translate(
+      planeWidth / 2 - windowHeight * 0.07,
+      planeHeight / 2 - windowHeight * 0.07
+    );
+    plane(planeWidth, planeHeight);
+    pop();
+  }
+
+  drawAxisWEBGL() {
+    push();
+    stroke(255, 0, 0);
+    strokeWeight(3);
+    line(-windowHeight * 0.07, 0, 0, windowWidth / 2, 0, 0);
+    stroke(0, 255, 0);
+    line(0, windowHeight * 0.07, 0, 0, -windowHeight / 2, 0);
+    stroke(0, 0, 255);
+    line(0, 0, -windowHeight * 0.07, 0, 0, windowHeight / 2);
+    pop();
+  }
+
+  drawPlaneWEBGL(p) {
+    push();
+    strokeWeight(0);
+    fill(255, 255, 255, 150);
+    const angle = p.n.angleBetween(createVector(0, 1, 0));
+    const rotationAxis = p.n.copy().cross(createVector(0, 1, 0));
+
+    let rotationAxis2 = createVector(
+      rotationAxis.x,
+      -rotationAxis.z,
+      rotationAxis.y
+    );
+
+    translate(
+      p.p1.x * this.cellSizeWEBGL,
+      -p.p1.z * this.cellSizeWEBGL,
+      p.p1.y * this.cellSizeWEBGL
+    );
+
+    rotate(angle, rotationAxis2);
+
+    plane(this.cellSizeWEBGL * 20, this.cellSizeWEBGL * 20);
+    pop();
   }
 }

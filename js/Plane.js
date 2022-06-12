@@ -1,7 +1,8 @@
 class Plane {
+  // p2 can be the normal vector and p1 the point
   constructor(p1, p2, p3 = 0) {
     this.type = "plane";
-    if (p1.type === point && p2.type === "point" && p3.type === point) {
+    if (p1.type === "point" && p2.type === "point" && p3.type === "point") {
       this.p1 = p1;
       this.p2 = p2;
       this.p3 = p3;
@@ -60,5 +61,9 @@ class Plane {
     let y = p2.y;
     let z = p2.z;
     return new Line(point, new Point(x, y, z));
+  }
+
+  parallelPlane(point) {
+    return new Plane(point, this.n);
   }
 }
