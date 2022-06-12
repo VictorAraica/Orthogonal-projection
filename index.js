@@ -14,6 +14,10 @@ function setup() {
   board = new Board();
   controlPanel = new ControlPanel(controlsContainer, addButton, board);
 
+  if (board.orthoWEBGL) {
+    ortho();
+  }
+
   WEBGLButton.addEventListener("click", () => {
     board.WEBGL = !board.WEBGL;
   });
@@ -22,16 +26,11 @@ function setup() {
 function draw() {
   background(15);
   if (!board.WEBGL) {
-    ortho();
     translate(-windowWidth / 2, -windowHeight / 2);
     board.drawBackground();
     board.drawShapes();
     board.xLimit = controlsContainer.offsetWidth;
   } else {
-    if (board.orthoWEBGL) {
-      ortho();
-    }
-
     translate(
       board.translateXWEBGL,
       board.translateYWEBGL,
