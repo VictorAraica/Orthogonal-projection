@@ -49,7 +49,15 @@ class Board {
 
   drawShapes() {
     // draw shapes in the list
-    for (let shape of this.shapes) {
+    let shapes = [...this.shapes];
+    shapes.sort((a, b) => {
+      if (a.type === "plane") {
+        return 1;
+      } else {
+        return 0;
+      }
+    });
+    for (let shape of shapes) {
       if (this.WEBGL) {
         this.drawWEBGL(shape);
       } else {
@@ -304,6 +312,8 @@ class Board {
   }
 
   drawLineWEBGL(l) {
+    let p1;
+    let p2;
     if (typeof l !== "object" || l === null) {
       return false;
     }
@@ -311,15 +321,26 @@ class Board {
     let color = l.color;
     let width = l.width;
 
-    const x1 = l.p1.x * this.cellSizeWEBGL;
-    // y = z because in webgl y is the cota and up is negative
-    const y1 = -l.p1.z * this.cellSizeWEBGL;
-    const z1 = l.p1.y * this.cellSizeWEBGL;
+    if (l.p1.x !== l.p2.x) {
+      p1 = l.getPointUsingX(50);
+      p2 = l.getPointUsingX(-50);
+    } else if (l.p1.y !== l.p2.y) {
+      p1 = l.getPointUsingY(50);
+      p2 = l.getPointUsingY(-50);
+    } else if (l.p1.z !== l.p2.z) {
+      p1 = l.getPointUsingZ(50);
+      p2 = l.getPointUsingZ(-50);
+    }
 
-    const x2 = l.p2.x * this.cellSizeWEBGL;
+    const x1 = p1.x * this.cellSizeWEBGL;
     // y = z because in webgl y is the cota and up is negative
-    const y2 = -l.p2.z * this.cellSizeWEBGL;
-    const z2 = l.p2.y * this.cellSizeWEBGL;
+    const y1 = -p1.z * this.cellSizeWEBGL;
+    const z1 = p1.y * this.cellSizeWEBGL;
+
+    const x2 = p2.x * this.cellSizeWEBGL;
+    // y = z because in webgl y is the cota and up is negative
+    const y2 = -p2.z * this.cellSizeWEBGL;
+    const z2 = p2.y * this.cellSizeWEBGL;
     2;
 
     strokeWeight(width);
