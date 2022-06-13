@@ -204,7 +204,6 @@ class Board {
     let width = l.width;
 
     const mousePos = this.pixelToScale(pmouseX, pmouseY);
-    // console.log(mousePos.x);
 
     const p1 = l.p1;
     const p2 = l.p2;
@@ -291,7 +290,7 @@ class Board {
     }
 
     const x = p.x * this.cellSizeWEBGL;
-    // y = z becaus in webgl y is the cota and up is negative
+    // y = z because in webgl y is the cota and up is negative
     const y = -p.z * this.cellSizeWEBGL;
     const z = p.y * this.cellSizeWEBGL;
 
@@ -313,12 +312,12 @@ class Board {
     let width = l.width;
 
     const x1 = l.p1.x * this.cellSizeWEBGL;
-    // y = z becaus in webgl y is the cota and up is negative
+    // y = z because in webgl y is the cota and up is negative
     const y1 = -l.p1.z * this.cellSizeWEBGL;
     const z1 = l.p1.y * this.cellSizeWEBGL;
 
     const x2 = l.p2.x * this.cellSizeWEBGL;
-    // y = z becaus in webgl y is the cota and up is negative
+    // y = z because in webgl y is the cota and up is negative
     const y2 = -l.p2.z * this.cellSizeWEBGL;
     const z2 = l.p2.y * this.cellSizeWEBGL;
     2;

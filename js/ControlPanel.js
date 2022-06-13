@@ -66,12 +66,14 @@ class ControlPanel {
   visibilityToggle(e, index) {
     if (this.inputs[index].shape.show) {
       this.inputs[index].shape.show = false;
+      this.inputs[index].show = false;
       e.target.className = e.target.className.replace(
         "bg-opacity-70",
         "bg-opacity-10"
       );
     } else {
       this.inputs[index].shape.show = true;
+      this.inputs[index].show = true;
       e.target.className = e.target.className.replace(
         "bg-opacity-10",
         "bg-opacity-70"
@@ -362,6 +364,10 @@ class ControlPanel {
       this.board.shapes.splice(sameNameElem.input.index, 1);
     }
 
+    if (!element.show) {
+      shape.show = false;
+    }
+
     element.shape = shape;
     element.name = name;
 
@@ -393,7 +399,7 @@ class ControlPanel {
     inputContainer.appendChild(input);
 
     this.controlsContainer.insertBefore(inputContainer, this.addButton);
-    this.inputs.push({ input, dependencies: [], command: command });
+    this.inputs.push({ input, dependencies: [], command: command, show: true });
     input.focus();
 
     return input;
