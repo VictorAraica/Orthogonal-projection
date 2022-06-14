@@ -9,6 +9,8 @@ class ControlPanel {
       "perpendicularLine",
       "segment",
       "perpendicularPlane",
+      "trazaH",
+      "trazaV",
     ];
     this.board = board;
 
@@ -31,11 +33,38 @@ class ControlPanel {
     };
 
     let commands = [
-      "p2 = (4, 3, 3)",
-      "p4 = (3, 3, 4)",
-      "p6 = (4, 4, 4)",
-      "plane = (p2, p4, p6)",
-      "perp = perpendicularLine(plane, p2)",
+      "p1 = (2, 3, 4)",
+      "p2 = (5, 6, 1)",
+      "p3 = (3, 8, 4)",
+      "plane = (p1, p2, p3)",
+      "l = (p2, p3)",
+      "aux1 = perpendicularLine(p1, l)",
+      "A = intersection(l, aux1)",
+      "aris1 = parallel(p2, aux1)",
+      "aris2 = perpendicularLine(plane, A)",
+      "p4 = (10, 8, 3)",
+      "plane2 = parallel(p4, plane)",
+      "B = intersection(plane2, aris2)",
+      "aris3 = parallel(aris2, p2)",
+      "C = intersection(plane2, aris3)",
+      "aris4 = parallel(l, p1)",
+      "D = intersection(aris4, aris1)",
+      "aris5 = parallel(D, aris3)",
+      "E = intersection(plane2, aris5)",
+      "aris6 = parallel(p1, aris3)",
+      "F = intersection(plane2, aris6)",
+      "a1 = segment(p1, A)",
+      "a2 = segment(p1, D)",
+      "a3 = segment(p1, F)",
+      "a4 = segment(p2, D)",
+      "a5 = segment(p2, A)",
+      "a6 = segment(p2, C)",
+      "a7 = segment(A, B)",
+      "a8 = segment(B, C)",
+      "a9 = segment(B, F)",
+      "a10 = segment(E, F)",
+      "a11 = segment(E, D)",
+      "a12 = segment(E, C)",
 
       // "p1 = (3, 3, 3)",
       // "p2 = (4, 3, 3)",
@@ -156,8 +185,9 @@ class ControlPanel {
       shape = input1.shape.planeIntersection(input2.shape);
     } else if (input1.shape.type === "plane" && input2.shape.type === "line") {
       shape = input2.shape.planeIntersection(input1.shape);
+    } else if (input1.shape.type === "plane" && input2.shape.type === "plane") {
+      shape = input2.shape.planeIntersection(input1.shape);
     }
-    // TODO interseccion plano plano
     if (shape) {
       this.addDependencies(index, [input1, input2]);
       return shape;
@@ -175,11 +205,9 @@ class ControlPanel {
       shape = input1.shape.parallelPlane(input2.shape);
     } else if (input1.shape.type === "point" && input2.shape.type === "plane") {
       shape = input2.shape.parallelPlane(input1.shape);
+    } else if (input1.shape.type === "plane" && input2.shape.type === "plane") {
+      shape = input2.shape.planeIntersection(input1.shape);
     }
-    // TODO
-    // else if (input1.shape.type === "plane" && input2.shape.type === "plane") {
-    //   shape = input2.shape.planeIntersection(input1.shape);
-    // }
     if (shape) {
       this.addDependencies(index, [input1, input2]);
       return shape;
@@ -231,6 +259,35 @@ class ControlPanel {
     return false;
   }
 
+  trazaH(index, input) {
+    let shape = false;
+    if (input.shape.type === "line") {
+      shape = input.shape.getPointUsingZ(0);
+    } else if (input.shape.type === "plane") {
+      shape = input.shape.planeIntersection(this.board.PH);
+    }
+    if (shape) {
+      this.addDependencies(index, [input]);
+      return shape;
+    }
+    return false;
+  }
+
+  trazaV(index, input) {
+    let shape = false;
+    if (input.shape.type === "line") {
+      shape = input.shape.getPointUsingY(0);
+    } else if (input.shape.type === "plane") {
+      shape = input.shape.planeIntersection(this.board.PV);
+    }
+
+    if (shape) {
+      this.addDependencies(index, [input]);
+      return shape;
+    }
+    return false;
+  }
+
   functionToShape(index, functionName, parameters) {
     if (!functionName in this.functions) {
       return false;
@@ -238,27 +295,24 @@ class ControlPanel {
 
     let shape;
 
-    const input1 = this.inputs.find(
-      (element) => element.name === parameters[0]
-    );
-    const input2 = this.inputs.find(
-      (element) => element.name === parameters[1]
-    );
-
-    if (!input1 || !input2) {
-      return false;
-    }
+    let inputs = parameters.map((parameter) => {
+      return this.inputs.find((element) => element.name === parameter);
+    });
 
     if (functionName === "intersection") {
-      shape = this.intersection(index, input1, input2);
+      shape = this.intersection(index, inputs[0], inputs[1]);
     } else if (functionName === "parallel") {
-      shape = this.parallel(index, input1, input2);
+      shape = this.parallel(index, inputs[0], inputs[1]);
     } else if (functionName === "perpendicularLine") {
-      shape = this.perpendicularLine(index, input1, input2);
+      shape = this.perpendicularLine(index, inputs[0], inputs[1]);
     } else if (functionName === "perpendicularPlane") {
-      shape = this.perpendicularPlane(index, input1, input2);
+      shape = this.perpendicularPlane(index, inputs[0], inputs[1]);
     } else if (functionName === "segment") {
-      shape = this.segmentedLine(index, input1, input2);
+      shape = this.segmentedLine(index, inputs[0], inputs[1]);
+    } else if (functionName === "trazaH") {
+      shape = this.trazaH(index, inputs[0]);
+    } else if (functionName === "trazaV") {
+      shape = this.trazaV(index, inputs[0]);
     }
 
     if (shape) {
@@ -296,7 +350,7 @@ class ControlPanel {
       element.command = "";
       element.input.placeholder = "";
       this.board.shapes[index] = false;
-      element.shape = false;
+      // element.shape = false;
       if (element.dependencies) {
         for (let i of element.dependencies) {
           this.updateInput(i);
@@ -312,6 +366,7 @@ class ControlPanel {
 
     // if no data delete input value and return
     if (!data) {
+      // TODO
       this.blurError(element, "");
       return false;
     }
@@ -330,11 +385,11 @@ class ControlPanel {
     // ---------------------------------------------
     let shape = false;
 
-    const functionRegex = /\w+\(\w+,\w+\)/;
+    const functionRegex = /\w+\(\.*,?.*?\,?\.*?\)/;
     if (data.match(functionRegex)) {
       let [functionName, parameters] = data.replace(/\)/g, "").split("(");
-
       parameters = parameters.split(",");
+
       shape = this.functionToShape(index, functionName, parameters);
 
       if (!shape) {
@@ -384,7 +439,6 @@ class ControlPanel {
     for (let i of element.dependencies) {
       this.updateInput(i);
     }
-
     return shape;
   }
 
@@ -392,7 +446,6 @@ class ControlPanel {
     let input = this.inputElement.cloneNode(true);
     let inputContainer = this.inputContainer.cloneNode(true);
     let inputVisibilityElement = this.inputVisibilityElement.cloneNode(true);
-    // input.addEventListener("focus", () => console.log("focus"));
     input.addEventListener("blur", (e) => this.updateInput(e.target.index));
     input.index = this.inputs.length;
 

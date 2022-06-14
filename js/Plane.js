@@ -6,6 +6,7 @@ class Plane {
       this.p1 = p1;
       this.p2 = p2;
       this.p3 = p3;
+
       let line1 = new Line(p1, p2);
       if (line1.pointInLine(p3)) {
         throw Error;
@@ -13,10 +14,10 @@ class Plane {
 
       let v1 = this.p1.vector.copy().sub(this.p2.vector);
       let v2 = this.p3.vector.copy().sub(this.p2.vector);
-      this.n = v1.cross(v2);
-    } else if (p1.type === "point" && (p2.x || p2.y || p2.z)) {
-      this.n = p2;
+      this.n = v1.copy().cross(v2);
+    } else {
       this.p1 = p1;
+      this.n = p2;
     }
 
     this.equation = {
@@ -64,6 +65,74 @@ class Plane {
   }
 
   parallelPlane(point) {
-    return new Plane(point, this.n);
+    return new Plane(point, this.n.copy());
+  }
+
+  planeIntersection(plane) {
+    if (plane.n == this.n) return false;
+
+    let x;
+    let y;
+    let z;
+
+    let direction = plane.n.copy().cross(this.n);
+
+    if (direction.x === 0 && direction.y === 0) {
+      // de pie
+      y =
+        (-plane.equation.x * this.equation.d +
+          this.equation.x * plane.equation.d) /
+        (plane.equation.x * this.equation.y -
+          plane.equation.y * this.equation.x);
+      z = 0;
+      x = this.getPointUsingYZ(y, z).x;
+    } else if (direction.x === 0 && direction.z === 0) {
+      // punta
+      z =
+        (-plane.equation.x * this.equation.d +
+          this.equation.x * plane.equation.d) /
+        (plane.equation.x * this.equation.z -
+          plane.equation.z * this.equation.x);
+      y = 0;
+      x = this.getPointUsingYZ(y, z).x;
+    } else if (direction.y === 0 && direction.z === 0) {
+      // horizontal y frontal
+      z =
+        (-plane.equation.y * this.equation.d +
+          this.equation.y * plane.equation.d) /
+        (plane.equation.y * this.equation.z -
+          plane.equation.z * this.equation.y);
+      x = 0;
+      y = this.getPointUsingXZ(x, z).y;
+    } else if (direction.y === 0) {
+      // frontal
+      y =
+        (-plane.equation.x * this.equation.d +
+          this.equation.x * plane.equation.d) /
+        (plane.equation.x * this.equation.y -
+          plane.equation.y * this.equation.x);
+      z = 0;
+      x = this.getPointUsingYZ(y, z).x;
+    } else if (direction.x === 0) {
+      // perfil
+      x =
+        (-plane.equation.z * this.equation.d +
+          this.equation.z * plane.equation.d) /
+        (plane.equation.z * this.equation.x -
+          plane.equation.x * this.equation.z);
+      y = 0;
+      z = this.getPointUsingXY(x, y).z;
+    } else {
+      z =
+        (-plane.equation.y * this.equation.d +
+          this.equation.y * plane.equation.d) /
+        (plane.equation.y * this.equation.z -
+          plane.equation.z * this.equation.y);
+      x = 0;
+      y = this.getPointUsingXZ(x, z).y;
+    }
+
+    const point = new Point(x, y, z);
+    return new Line(point, direction);
   }
 }

@@ -8,13 +8,14 @@ const addButton = document.getElementById("add-button");
 const WEBGLButton = document.getElementById("WEBGL-toggle-button");
 
 function setup() {
-  createCanvas(windowWidth, windowHeight, WEBGL);
+  const renderer = createCanvas(windowWidth, windowHeight, WEBGL);
+  renderer.drawingContext.disable(renderer.drawingContext.DEPTH_TEST);
 
   board = new Board();
   controlPanel = new ControlPanel(controlsContainer, addButton, board);
 
   if (board.orthoWEBGL) {
-    ortho();
+    ortho(-width / 2, width / 2, -height / 2, height / 2, 10000, -10000);
   }
 
   WEBGLButton.addEventListener("click", () => {
@@ -54,10 +55,9 @@ function mouseDragged(e) {
   }
 }
 
-function mouseClicked() {
-  // board.test();
-  // console.log(controlPanel.board.shapes[6]);
-}
+// function mouseClicked() {
+// board.test();
+// }
 
 function mouseWheel(e) {
   if (!board.WEBGL) {

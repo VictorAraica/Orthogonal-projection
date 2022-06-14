@@ -5,14 +5,17 @@ class Board {
     this.cameraPos = createVector(8, windowHeight / this.cellSize / 2);
     this.shapes = [];
     this.xLimit = 0;
-    this.WEBGL = false;
+    this.WEBGL = true;
     this.rotateXWEBGL = 0;
     this.rotateYWEBGL = 0;
     this.translateXWEBGL =
       -windowWidth / 2 + controlsContainer.offsetWidth + windowWidth * 0.1;
     this.translateYWEBGL = windowHeight / 4;
     this.translateZWEBGL = 0;
-    this.orthoWEBGL = false;
+    this.orthoWEBGL = true;
+    this.origin = new Point(0, 0, 0);
+    this.PV = new Plane(this.origin, new Point(2, 0, 1), new Point(3, 0, 5));
+    this.PH = new Plane(this.origin, new Point(2, 1, 0), new Point(3, 6, 0));
   }
 
   test() {}
@@ -93,6 +96,7 @@ class Board {
 
   zoom(e) {
     if (mouseX > this.xLimit) {
+      e.preventDefault();
       if (e.deltaY > 0) {
         this.cellSize *= 0.9;
         if (this.cellSize < 18) {
@@ -106,8 +110,8 @@ class Board {
 
   zoomWEBGL(e) {
     if (mouseX > this.xLimit) {
+      e.preventDefault();
       if (e.ctrlKey) {
-        e.preventDefault();
         if (e.deltaY > 0) {
           this.translateZWEBGL -= this.cellSizeWEBGL;
         } else {
@@ -306,7 +310,7 @@ class Board {
     let rad = p.rad;
 
     stroke(...color);
-    strokeWeight(rad);
+    strokeWeight(rad * 1.5);
 
     point(x, y, z);
   }
@@ -383,7 +387,7 @@ class Board {
       -planeHeight / 2 + windowHeight * 0.07
     );
     strokeWeight(0);
-    fill(80, 80, 80, 150);
+    fill(0, 50, 50, 50);
     plane(planeWidth, planeHeight);
     pop();
   }
@@ -393,7 +397,7 @@ class Board {
     const planeWidth = windowHeight * 0.07 + windowWidth / 2;
     const planeHeight = windowHeight * 0.57;
     strokeWeight(0);
-    fill(80, 80, 80, 150);
+    fill(0, 50, 50, 50);
     rotateX(PI / 2);
     translate(
       planeWidth / 2 - windowHeight * 0.07,
@@ -418,7 +422,7 @@ class Board {
   drawPlaneWEBGL(p) {
     push();
     strokeWeight(0);
-    fill(130, 130, 130, 150);
+    fill(130, 130, 130, 100);
     let angle = p.n.angleBetween(createVector(0, 1, 0));
     const rotationAxis = p.n.copy().cross(createVector(0, 1, 0));
 
@@ -442,7 +446,7 @@ class Board {
       rotate(angle, rotationAxis2);
     }
 
-    plane(this.cellSizeWEBGL * 20, this.cellSizeWEBGL * 20);
+    plane(this.cellSizeWEBGL * 35, this.cellSizeWEBGL * 35);
     pop();
   }
 }

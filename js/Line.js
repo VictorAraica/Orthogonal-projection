@@ -1,10 +1,17 @@
 class Line {
-  // if p2 is a vector it will be taken as the direction vector
   constructor(p1, p2) {
     this.type = "line";
-    this.p1 = p1;
-    this.p2 = p2;
-    this.direction = this.p2.vector.copy().sub(this.p1.vector);
+    if (p2.type === "point") {
+      this.p1 = p1;
+      this.p2 = p2;
+      this.direction = this.p2.vector.copy().sub(this.p1.vector);
+    } else {
+      // if p2 is a vector it will be taken as the direction vector
+      this.p1 = p1;
+      const point2Vector = p1.vector.copy().add(p2.mult(3));
+      this.p2 = new Point(point2Vector);
+      this.direction = p2;
+    }
 
     let m = (p2.y - p1.y) / (p2.x - p1.x);
     this.equationY = {
@@ -138,15 +145,15 @@ class Line {
   }
 
   perpendicularLine(point) {
-    const a = point.vector.copy().sub(this.p1.vector);
-    const b = this.p2.vector.copy().sub(this.p1.vector);
+    const a = this.p1.vector.copy().sub(point.vector);
 
-    const p2 = b.mult(a.copy().dot(b) / b.copy().dot(b));
+    let t =
+      -a.copy().dot(this.direction) / this.direction.copy().dot(this.direction);
 
-    return new Line(point, new Point(p2.x, p2.y, p2.z));
+    let p2 = this.p1.vector.copy().add(this.direction.copy().mult(t));
+    return new Line(point, new Point(p2));
   }
 
-  // TODO
   perpendicularPlane(point) {
     return new Plane(point, this.direction);
   }
