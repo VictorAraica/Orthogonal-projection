@@ -5,7 +5,7 @@ class Board {
     this.cameraPos = createVector(8, windowHeight / this.cellSize / 2);
     this.shapes = [];
     this.xLimit = 0;
-    this.WEBGL = true;
+    this.WEBGL = false;
     this.rotateXWEBGL = 0;
     this.rotateYWEBGL = 0;
     this.translateXWEBGL =

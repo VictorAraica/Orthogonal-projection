@@ -155,6 +155,6 @@ class Line {
   }
 
   perpendicularPlane(point) {
-    return new Plane(point, this.direction);
+    return new Plane(point, this.direction.copy());
   }
 }

@@ -293,33 +293,33 @@ class ControlPanel {
       return false;
     }
 
-    let shape;
+    let shape = false;
 
     let inputs = parameters.map((parameter) => {
       return this.inputs.find((element) => element.name === parameter);
     });
 
-    if (functionName === "intersection") {
-      shape = this.intersection(index, inputs[0], inputs[1]);
-    } else if (functionName === "parallel") {
-      shape = this.parallel(index, inputs[0], inputs[1]);
-    } else if (functionName === "perpendicularLine") {
-      shape = this.perpendicularLine(index, inputs[0], inputs[1]);
-    } else if (functionName === "perpendicularPlane") {
-      shape = this.perpendicularPlane(index, inputs[0], inputs[1]);
-    } else if (functionName === "segment") {
-      shape = this.segmentedLine(index, inputs[0], inputs[1]);
-    } else if (functionName === "trazaH") {
-      shape = this.trazaH(index, inputs[0]);
-    } else if (functionName === "trazaV") {
-      shape = this.trazaV(index, inputs[0]);
+    if (inputs[0] && inputs[1]) {
+      if (functionName === "intersection") {
+        shape = this.intersection(index, inputs[0], inputs[1]);
+      } else if (functionName === "parallel") {
+        shape = this.parallel(index, inputs[0], inputs[1]);
+      } else if (functionName === "perpendicularLine") {
+        shape = this.perpendicularLine(index, inputs[0], inputs[1]);
+      } else if (functionName === "perpendicularPlane") {
+        shape = this.perpendicularPlane(index, inputs[0], inputs[1]);
+      } else if (functionName === "segment") {
+        shape = this.segmentedLine(index, inputs[0], inputs[1]);
+      }
+    } else if (inputs[0]) {
+      if (functionName === "trazaH") {
+        shape = this.trazaH(index, inputs[0]);
+      } else if (functionName === "trazaV") {
+        shape = this.trazaV(index, inputs[0]);
+      }
     }
 
-    if (shape) {
-      return shape;
-    }
-
-    return false;
+    return shape;
   }
 
   getNameAndData(value) {

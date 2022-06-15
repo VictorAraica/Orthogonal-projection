@@ -13,6 +13,8 @@ nombre = intersection(recta1, recta2) 		punto interseccion de 2 rectas
 nombre = intersection(plano, recta) 		punto interseccion de plano recta
 nombre = intersection(recta, recta) 		punto interseccion de plano recta
 
+nombre = intersection(plano, plano) 		punto interseccion de plano plano
+
 nombre = parallel(punto, recta)			paralela a recta que pasa por un punto
 nombre = parallel(recta, punto)			paralela a recta que pasa por un punto
 
