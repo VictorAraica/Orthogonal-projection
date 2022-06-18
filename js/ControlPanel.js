@@ -2,6 +2,13 @@ class ControlPanel {
   constructor(controlsContainer, addButton, board) {
     this.controlsContainer = controlsContainer;
     this.addButton = addButton;
+    // {
+    // command: input value
+    // dependencies: list of shapes that depend on this one
+    // name
+    // shape
+    // show
+    // }
     this.inputs = [];
     this.functions = [
       "intersection",
@@ -14,6 +21,7 @@ class ControlPanel {
     ];
     this.board = board;
 
+    // size of controls container
     this.board.xLimit = controlsContainer.offsetWidth;
 
     this.inputElement = document.createElement("input");
@@ -33,8 +41,8 @@ class ControlPanel {
     };
 
     let commands = [
-      "p1 = (2, 3, 4)",
-      "p2 = (5, 6, 1)",
+      "p1 = (1, 4, 4)",
+      "p2 = (5.3, 7, 1)",
       "p3 = (3, 8, 4)",
       "plane = (p1, p2, p3)",
       "l = (p2, p3)",
@@ -65,27 +73,6 @@ class ControlPanel {
       "a10 = segment(E, F)",
       "a11 = segment(E, D)",
       "a12 = segment(E, C)",
-
-      // "p1 = (3, 3, 3)",
-      // "p2 = (4, 3, 3)",
-      // "p3 = (3, 4, 3)",
-      // "p4 = (3, 3, 4)",
-      // "p5 = (3, 4, 4)",
-      // "p6 = (4, 4, 4)",
-      // "p7 = (4, 3, 4)",
-      // "p8 = (4, 4, 3)",
-      // "l1 = segment(p1, p2)",
-      // "l2 = segment(p1, p3)",
-      // "l3 = segment(p3, p5)",
-      // "l4 = segment(p1, p4)",
-      // "l5 = segment(p2, p7)",
-      // "l6 = segment(p2, p8)",
-      // "l7 = segment(p3, p8)",
-      // "l9 = segment(p4, p5)",
-      // "l10 = segment(p4, p7)",
-      // "l11 = segment(p5, p6)",
-      // "l12 = segment(p6, p7)",
-      // "l13 = segment(p6, p8)",
     ];
 
     for (let command of commands) {
@@ -96,6 +83,10 @@ class ControlPanel {
       this.inputs[i].input.value = commands[i];
       this.updateInput(i);
     }
+  }
+
+  test() {
+    // console.log(this.inputs[15]);
   }
 
   visibilityToggle(e, index) {
@@ -117,6 +108,7 @@ class ControlPanel {
   }
 
   addDependencies(index, dependencies) {
+    // add index to dependencies list of the shapes used to make this one
     for (let i of dependencies) {
       if (!i.dependencies.includes(index)) {
         i.dependencies.push(index);
@@ -139,7 +131,7 @@ class ControlPanel {
       const shape2 = this.inputs.find((element) => element.name === data[1]);
 
       if (!shape1 || !shape2) {
-        return false;
+        return "argument not found";
       }
 
       // if two points create line
@@ -153,7 +145,7 @@ class ControlPanel {
       const shape2 = this.inputs.find((element) => element.name === data[1]);
       const shape3 = this.inputs.find((element) => element.name === data[2]);
       if (!shape1 || !shape2 || !shape3) {
-        return false;
+        return "argument not found";
       }
 
       // if 3 points create plane
@@ -164,14 +156,14 @@ class ControlPanel {
       ) {
         let line = new Line(shape1.shape, shape2.shape);
         if (line.pointInLine(shape3.shape)) {
-          return false;
+          return "the 3 points on the same line";
         }
         shape = new Plane(shape1.shape, shape2.shape, shape3.shape);
 
         this.addDependencies(index, [shape1, shape2, shape3]);
       }
     }
-    if (!shape) return false;
+    if (!shape) return "error creating the shape";
 
     return shape;
   }
@@ -192,7 +184,7 @@ class ControlPanel {
       this.addDependencies(index, [input1, input2]);
       return shape;
     }
-    return false;
+    return "error creating the shape";
   }
 
   parallel(index, input1, input2) {
@@ -212,7 +204,7 @@ class ControlPanel {
       this.addDependencies(index, [input1, input2]);
       return shape;
     }
-    return false;
+    return "error creating the shape";
   }
 
   perpendicularLine(index, input1, input2) {
@@ -230,7 +222,7 @@ class ControlPanel {
       this.addDependencies(index, [input1, input2]);
       return shape;
     }
-    return false;
+    return "error creating the shape";
   }
 
   perpendicularPlane(index, input1, input2) {
@@ -244,7 +236,7 @@ class ControlPanel {
       this.addDependencies(index, [input1, input2]);
       return shape;
     }
-    return false;
+    return "error creating the shape";
   }
 
   segmentedLine(index, input1, input2) {
@@ -256,7 +248,7 @@ class ControlPanel {
       this.addDependencies(index, [input1, input2]);
       return shape;
     }
-    return false;
+    return "error creating the shape";
   }
 
   trazaH(index, input) {
@@ -270,7 +262,7 @@ class ControlPanel {
       this.addDependencies(index, [input]);
       return shape;
     }
-    return false;
+    return "error creating the shape";
   }
 
   trazaV(index, input) {
@@ -285,15 +277,14 @@ class ControlPanel {
       this.addDependencies(index, [input]);
       return shape;
     }
-    return false;
+    return "error creating the shape";
   }
 
   functionToShape(index, functionName, parameters) {
+    let shape = "error creating the shape";
     if (!functionName in this.functions) {
-      return false;
+      return shape;
     }
-
-    let shape = false;
 
     let inputs = parameters.map((parameter) => {
       return this.inputs.find((element) => element.name === parameter);
@@ -340,23 +331,25 @@ class ControlPanel {
     element.input.placeholder = error;
   }
 
-  updateInput(index) {
+  updateInput(index, userUpdate = true) {
     let element = this.inputs[index];
     let value = element.input.value;
 
-    if (value === "") {
+    if (value === "" && userUpdate) {
       element.shape = "";
       element.name = "";
       element.command = "";
       element.input.placeholder = "";
       this.board.shapes[index] = false;
-      // element.shape = false;
+      element.shape = false;
       if (element.dependencies) {
         for (let i of element.dependencies) {
           this.updateInput(i);
         }
       }
       element.dependencies = [];
+    } else if (value === "") {
+      value = element.command;
     }
 
     // ---------------------------------------------
@@ -366,8 +359,7 @@ class ControlPanel {
 
     // if no data delete input value and return
     if (!data) {
-      // TODO
-      this.blurError(element, "");
+      this.blurError(element, "no data");
       return false;
     }
 
@@ -392,13 +384,14 @@ class ControlPanel {
 
       shape = this.functionToShape(index, functionName, parameters);
 
-      if (!shape) {
-        this.blurError(element, "error");
+      if (typeof shape === "string" || shape instanceof String) {
+        this.blurError(element, shape);
         return false;
       }
 
       element.command = `${name} = ${functionName}(${parameters.join(", ")})`;
     }
+
     // ---------------------------------------------
 
     if (!shape) {
@@ -411,8 +404,8 @@ class ControlPanel {
 
       shape = this.textToShape(data, index);
 
-      if (!shape) {
-        this.blurError(element, "error");
+      if (typeof shape === "string" || shape instanceof String) {
+        this.blurError(element, shape);
         return false;
       }
 
@@ -437,8 +430,9 @@ class ControlPanel {
     this.board.addShape(shape, index);
 
     for (let i of element.dependencies) {
-      this.updateInput(i);
+      this.updateInput(i, false);
     }
+
     return shape;
   }
 

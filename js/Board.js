@@ -18,7 +18,9 @@ class Board {
     this.PH = new Plane(this.origin, new Point(2, 1, 0), new Point(3, 6, 0));
   }
 
-  test() {}
+  // test() {
+  //   console.log(this.shapes[15]);
+  // }
 
   addShape(shape, index) {
     this.shapes.splice(index, 0, shape);

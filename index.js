@@ -55,9 +55,9 @@ function mouseDragged(e) {
   }
 }
 
-// function mouseClicked() {
-// board.test();
-// }
+function mouseClicked() {
+  controlPanel.test();
+}
 
 function mouseWheel(e) {
   if (!board.WEBGL) {
