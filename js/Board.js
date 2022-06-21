@@ -18,10 +18,6 @@ class Board {
     this.PH = new Plane(this.origin, new Point(2, 1, 0), new Point(3, 6, 0));
   }
 
-  // test() {
-  //   console.log(this.shapes[15]);
-  // }
-
   addShape(shape, index) {
     this.shapes.splice(index, 0, shape);
   }
@@ -31,7 +27,11 @@ class Board {
   }
 
   draw(shape) {
-    if (shape.type === "point" && shape.show) {
+    if (Array.isArray(shape)) {
+      for (let i of shape) {
+        this.draw(i);
+      }
+    } else if (shape.type === "point" && shape.show) {
       this.drawPoint(shape);
     } else if (shape.type === "line" && shape.show) {
       this.drawLine(shape);
@@ -41,7 +41,11 @@ class Board {
   }
 
   drawWEBGL(shape) {
-    if (shape.type === "point" && shape.show) {
+    if (Array.isArray(shape)) {
+      for (let i of shape) {
+        this.drawWEBGL(i);
+      }
+    } else if (shape.type === "point" && shape.show) {
       this.drawPointWEBGL(shape);
     } else if (shape.type === "line" && shape.show) {
       this.drawLineWEBGL(shape);

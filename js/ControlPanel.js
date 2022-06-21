@@ -1,3 +1,5 @@
+// TODO POLYGONS WITH CENTER AND POINT
+
 class ControlPanel {
   constructor(controlsContainer, addButton, board) {
     this.controlsContainer = controlsContainer;
@@ -18,6 +20,8 @@ class ControlPanel {
       "perpendicularPlane",
       "trazaH",
       "trazaV",
+      "triangle",
+      "pentagon",
     ];
     this.board = board;
 
@@ -45,6 +49,7 @@ class ControlPanel {
       "p2 = (5.3, 7, 1)",
       "p3 = (3, 8, 4)",
       "plane = (p1, p2, p3)",
+      // "p = polygon(5, plane, p1, p2)",
       "l = (p2, p3)",
       "aux1 = perpendicularLine(p1, l)",
       "A = intersection(l, aux1)",
@@ -280,6 +285,37 @@ class ControlPanel {
     return "error creating the shape";
   }
 
+  polygon(index, sides, plane, center, vertex) {
+    let shapes = [];
+    let v = vertex.shape.vector.copy().sub(center.shape.vector);
+    let axis = plane.shape.n.copy().normalize();
+    let rotatedVector;
+    let angle = (2 * PI) / sides;
+
+    for (let i = 0; i < sides; i++) {
+      if (i > 0) {
+        v = rotatedVector;
+      }
+
+      let a = v.copy().mult(cos(angle));
+      let b = axis
+        .copy()
+        .mult(v.copy().dot(axis))
+        .mult(1 - cos(angle));
+      let c = axis.copy().cross(v).mult(sin(angle));
+
+      rotatedVector = a.add(b).add(c);
+
+      shapes.push(new Point(center.shape.vector.copy().add(rotatedVector)));
+    }
+
+    if (shapes) {
+      this.addDependencies(index, [plane, center, vertex]);
+      return shapes;
+    }
+    return "error creating the shape";
+  }
+
   functionToShape(index, functionName, parameters) {
     let shape = "error creating the shape";
     if (!functionName in this.functions) {
@@ -290,24 +326,20 @@ class ControlPanel {
       return this.inputs.find((element) => element.name === parameter);
     });
 
-    if (inputs[0] && inputs[1]) {
-      if (functionName === "intersection") {
-        shape = this.intersection(index, inputs[0], inputs[1]);
-      } else if (functionName === "parallel") {
-        shape = this.parallel(index, inputs[0], inputs[1]);
-      } else if (functionName === "perpendicularLine") {
-        shape = this.perpendicularLine(index, inputs[0], inputs[1]);
-      } else if (functionName === "perpendicularPlane") {
-        shape = this.perpendicularPlane(index, inputs[0], inputs[1]);
-      } else if (functionName === "segment") {
-        shape = this.segmentedLine(index, inputs[0], inputs[1]);
-      }
-    } else if (inputs[0]) {
-      if (functionName === "trazaH") {
-        shape = this.trazaH(index, inputs[0]);
-      } else if (functionName === "trazaV") {
-        shape = this.trazaV(index, inputs[0]);
-      }
+    if (functionName === "intersection") {
+      shape = this.intersection(index, inputs[0], inputs[1]);
+    } else if (functionName === "parallel") {
+      shape = this.parallel(index, inputs[0], inputs[1]);
+    } else if (functionName === "perpendicularLine") {
+      shape = this.perpendicularLine(index, inputs[0], inputs[1]);
+    } else if (functionName === "perpendicularPlane") {
+      shape = this.perpendicularPlane(index, inputs[0], inputs[1]);
+    } else if (functionName === "segment") {
+      shape = this.segmentedLine(index, inputs[0], inputs[1]);
+    } else if (functionName === "trazaH") {
+      shape = this.trazaH(index, inputs[0]);
+    } else if (functionName === "trazaV") {
+      shape = this.trazaV(index, inputs[0]);
     }
 
     return shape;
@@ -377,18 +409,37 @@ class ControlPanel {
     // ---------------------------------------------
     let shape = false;
 
-    const functionRegex = /\w+\(\.*,?.*?\,?\.*?\)/;
+    const functionRegex = /\w+\(.+\,?.*\,.*\,?.*\,?.*\,?.*\,?.*\,?.*\,?.*\)/;
     if (data.match(functionRegex)) {
       let [functionName, parameters] = data.replace(/\)/g, "").split("(");
       parameters = parameters.split(",");
 
-      shape = this.functionToShape(index, functionName, parameters);
+      if (functionName === "polygon") {
+        let inputs = parameters.map((parameter) => {
+          return this.inputs.find((element) => element.name === parameter);
+        });
+        shape = this.polygon(
+          index,
+          parameters[0],
+          inputs[1],
+          inputs[2],
+          inputs[3]
+        );
 
-      if (typeof shape === "string" || shape instanceof String) {
-        this.blurError(element, shape);
-        return false;
+        // console.log(shape);
+
+        // let commands = shapes.map(
+        //   (shape, i) =>
+        //     `ABC${i} = (${shape.vector.x}, ${shape.vector.y}, ${shape.vector.z})`
+        // );
+      } else {
+        shape = this.functionToShape(index, functionName, parameters);
+
+        if (typeof shape === "string" || shape instanceof String) {
+          this.blurError(element, shape);
+          return false;
+        }
       }
-
       element.command = `${name} = ${functionName}(${parameters.join(", ")})`;
     }
 
