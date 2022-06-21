@@ -49,38 +49,34 @@ class ControlPanel {
       "p2 = (5.3, 7, 1)",
       "p3 = (3, 8, 4)",
       "plane = (p1, p2, p3)",
-
-      "traza = trazaH(plane)",
-      // "l = (p2, p3)",
-      // "aux1 = perpendicularLine(p1, l)",
-      // "A = intersection(l, aux1)",
-      // "aris1 = parallel(p2, aux1)",
-      // "aris2 = perpendicularLine(plane, A)",
-      // "p4 = (10, 8, 3)",
-      // "plane2 = parallel(p4, plane)",
-      // "B = intersection(plane2, aris2)",
-      // "aris3 = parallel(aris2, p2)",
-      // "C = intersection(plane2, aris3)",
-      // "aris4 = parallel(l, p1)",
-      // "D = intersection(aris4, aris1)",
-      // "aris5 = parallel(D, aris3)",
-      // "E = intersection(plane2, aris5)",
-      // "aris6 = parallel(p1, aris3)",
-      // "F = intersection(plane2, aris6)",
-      // "a1 = segment(p1, A)",
-      // "a2 = segment(p1, D)",
-      // "a3 = segment(p1, F)",
-      // "a4 = segment(p2, D)",
-      // "a5 = segment(p2, A)",
-      // "a6 = segment(p2, C)",
-      // "a7 = segment(A, B)",
-      // "a8 = segment(B, C)",
-      // "a9 = segment(B, F)",
-      // "a10 = segment(E, F)",
-      // "a11 = segment(E, D)",
-      // "a12 = segment(E, C)",
-
-      // "p = polygon(5, plane, p1, p2)",
+      "l = (p2, p3)",
+      "aux1 = perpendicularLine(p1, l)",
+      "A = intersection(l, aux1)",
+      "aris1 = parallel(p2, aux1)",
+      "aris2 = perpendicularLine(plane, A)",
+      "p4 = (10, 8, 3)",
+      "plane2 = parallel(p4, plane)",
+      "B = intersection(plane2, aris2)",
+      "aris3 = parallel(aris2, p2)",
+      "C = intersection(plane2, aris3)",
+      "aris4 = parallel(l, p1)",
+      "D = intersection(aris4, aris1)",
+      "aris5 = parallel(D, aris3)",
+      "E = intersection(plane2, aris5)",
+      "aris6 = parallel(p1, aris3)",
+      "F = intersection(plane2, aris6)",
+      "a1 = segment(p1, A)",
+      "a2 = segment(p1, D)",
+      "a3 = segment(p1, F)",
+      "a4 = segment(p2, D)",
+      "a5 = segment(p2, A)",
+      "a6 = segment(p2, C)",
+      "a7 = segment(A, B)",
+      "a8 = segment(B, C)",
+      "a9 = segment(B, F)",
+      "a10 = segment(E, F)",
+      "a11 = segment(E, D)",
+      "a12 = segment(E, C)",
     ];
 
     for (let command of commands) {
@@ -98,15 +94,23 @@ class ControlPanel {
   }
 
   visibilityToggle(e, index) {
-    if (this.inputs[index].shape.show) {
-      this.inputs[index].shape.show = false;
+    if (this.inputs[index].show) {
+      if (this.inputs[index].shape.constructor.name === "Array") {
+        for (let shape of this.inputs[index].shape) shape.show = false;
+      } else {
+        this.inputs[index].shape.show = false;
+      }
       this.inputs[index].show = false;
       e.target.className = e.target.className.replace(
         "bg-opacity-70",
         "bg-opacity-10"
       );
     } else {
-      this.inputs[index].shape.show = true;
+      if (this.inputs[index].shape.constructor.name === "Array") {
+        for (let shape of this.inputs[index].shape) shape.show = true;
+      } else {
+        this.inputs[index].shape.show = true;
+      }
       this.inputs[index].show = true;
       e.target.className = e.target.className.replace(
         "bg-opacity-10",
@@ -139,6 +143,7 @@ class ControlPanel {
       const shape2 = this.inputs.find((element) => element.name === data[1]);
 
       if (!shape1 || !shape2) {
+        // console.log("holaaaa");
         return "argument not found";
       }
 
@@ -289,7 +294,8 @@ class ControlPanel {
   }
 
   polygon(index, sides, plane, center, vertex) {
-    let shapes = [];
+    let points = [];
+    let lines = [];
     let v = vertex.shape.vector.copy().sub(center.shape.vector);
     let axis = plane.shape.n.copy().normalize();
     let rotatedVector;
@@ -309,14 +315,57 @@ class ControlPanel {
 
       rotatedVector = a.add(b).add(c);
 
-      shapes.push(new Point(center.shape.vector.copy().add(rotatedVector)));
+      points.push(new Point(center.shape.vector.copy().add(rotatedVector)));
     }
 
-    if (shapes) {
+    // TODO
+    if (points) {
       this.addDependencies(index, [plane, center, vertex]);
-      return shapes;
+      for (let i = 0; i < points.length; i++) {
+        lines.push(
+          new SegmentedLine(points[i], points[(i + 1) % points.length])
+        );
+      }
+
+      return [points, lines];
     }
     return "error creating the shape";
+  }
+
+  polygonFunction(index, name, parameters) {
+    let inputs = parameters.map((parameter) => {
+      return this.inputs.find((element) => element.name === parameter);
+    });
+    let [points, lines] = this.polygon(
+      index,
+      parameters[0],
+      inputs[1],
+      inputs[2],
+      inputs[3]
+    );
+
+    let names = points.map((_, i) => `${name}${i}`);
+
+    let sameNameElements = names.map((vertexName) =>
+      this.inputs.find((element) => element.name === vertexName)
+    );
+
+    let commands = points.map(
+      (point, i) =>
+        `${name}${i} = (${point.vector.x}, ${point.vector.y}, ${point.vector.z})`
+    );
+
+    for (let i = 0; i < names.length; i++) {
+      if (!sameNameElements[i]) {
+        this.createInput(commands[i]);
+        this.inputs[this.inputs.length - 1].input.blur();
+      } else {
+        sameNameElements[i].input.value = commands[i];
+        this.updateInput(sameNameElements[i].input.index);
+      }
+    }
+
+    return lines;
   }
 
   functionToShape(index, functionName, parameters) {
@@ -412,27 +461,13 @@ class ControlPanel {
     // ---------------------------------------------
     let shape = false;
 
-    const functionRegex = /\w+\(.+\,?.+?\,?.+?\,?.+?\)/;
+    const functionRegex = /\w+\(.+\,?.*\,?.*?\,?.*?\)/;
     if (data.match(functionRegex)) {
       let [functionName, parameters] = data.replace(/\)/g, "").split("(");
       parameters = parameters.split(",");
 
       if (functionName === "polygon") {
-        let inputs = parameters.map((parameter) => {
-          return this.inputs.find((element) => element.name === parameter);
-        });
-        shape = this.polygon(
-          index,
-          parameters[0],
-          inputs[1],
-          inputs[2],
-          inputs[3]
-        );
-
-        // let commands = shapes.map(
-        //   (shape, i) =>
-        //     `ABC${i} = (${shape.vector.x}, ${shape.vector.y}, ${shape.vector.z})`
-        // );
+        shape = this.polygonFunction(index, name, parameters);
       } else {
         shape = this.functionToShape(index, functionName, parameters);
         if (typeof shape === "string" || shape instanceof String) {
@@ -491,7 +526,9 @@ class ControlPanel {
     let input = this.inputElement.cloneNode(true);
     let inputContainer = this.inputContainer.cloneNode(true);
     let inputVisibilityElement = this.inputVisibilityElement.cloneNode(true);
+
     input.addEventListener("blur", (e) => this.updateInput(e.target.index));
+    input.value = command;
     input.index = this.inputs.length;
 
     inputVisibilityElement.index = this.inputs.length;
