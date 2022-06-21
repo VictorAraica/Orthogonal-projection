@@ -35,3 +35,5 @@ nombre = trazaV(recta) 	traza vertical de la recta
 
 nombre = trazaH(plano) 	traza horizontal del plano
 nombre = trazaV(plano) 	traza vertical del plano
+
+nombre = polygon(lados, plano, centro, vertice)
