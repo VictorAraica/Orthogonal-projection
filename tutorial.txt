@@ -15,11 +15,11 @@ nombre = intersection(recta, recta) 		punto interseccion de plano recta
 
 nombre = intersection(plano, plano) 		punto interseccion de plano plano
 
-nombre = parallel(punto, recta)			paralela a recta que pasa por un punto
-nombre = parallel(recta, punto)			paralela a recta que pasa por un punto
+nombre = parallel(punto, recta)			    paralela a recta que pasa por un punto
+nombre = parallel(recta, punto)			    paralela a recta que pasa por un punto
 
-nombre = parallel(plano, punto)			plano paralelo que pasa por un punto
-nombre = parallel(punto, plano)			plano paralelo que pasa por un punto
+nombre = parallel(plano, punto)			    plano paralelo que pasa por un punto
+nombre = parallel(punto, plano)			    plano paralelo que pasa por un punto
 
 nombre = perpendicularLine(punto, recta)  	perpendicular a recta que pasa por punto
 nombre = perpendicularLine(recta, punto)  	perpendicular a recta que pasa por punto
@@ -30,10 +30,10 @@ nombre = perpendicularLine(punto, plano)  	perpendicular a plano que pasa por pu
 nombre = perpendicularPlane(recta, punto) 	plano perpendicular a una recta que pasa por un punto
 nombre = perpendicularPlane(punto, recta) 	plano perpendicular a una recta que pasa por un punto
 
-nombre = trazaH(recta) 	traza horizontal de la recta
-nombre = trazaV(recta) 	traza vertical de la recta
+nombre = trazaH(recta) 	                    traza horizontal de la recta
+nombre = trazaV(recta) 	                    traza vertical de la recta
 
-nombre = trazaH(plano) 	traza horizontal del plano
-nombre = trazaV(plano) 	traza vertical del plano
+nombre = trazaH(plano) 	                    traza horizontal del plano
+nombre = trazaV(plano) 	                    traza vertical del plano
 
-nombre = polygon(lados, plano, centro, vertice)
+nombre = polygon(lados, plano, centro, vertice) 
