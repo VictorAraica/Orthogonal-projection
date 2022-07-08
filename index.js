@@ -41,9 +41,9 @@ function draw() {
     rotateY(board.rotateYWEBGL);
 
     board.drawAxisWEBGL();
-    board.drawShapes();
     board.drawPH();
     board.drawPV();
+    board.drawShapes();
   }
 }
 

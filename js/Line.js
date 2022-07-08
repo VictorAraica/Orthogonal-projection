@@ -29,6 +29,7 @@ class Line {
 
     this.show = true;
     this.color = [255, 255, 255];
+    this.alpha = 1;
     this.width = 2;
   }
 

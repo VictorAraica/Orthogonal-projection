@@ -24,5 +24,6 @@ class Point {
 
     this.rad = 7;
     this.color = [255, 255, 255];
+    this.alpha = 1;
   }
 }

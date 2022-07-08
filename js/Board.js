@@ -27,16 +27,26 @@ class Board {
   }
 
   draw(shape) {
-    if (Array.isArray(shape)) {
-      for (let i of shape) {
-        this.draw(i);
-      }
-    } else if (shape.type === "point" && shape.show) {
+    if (shape.type === "point" && shape.show) {
       this.drawPoint(shape);
     } else if (shape.type === "line" && shape.show) {
       this.drawLine(shape);
     } else if (shape.type === "segmented line" && shape.show) {
       this.drawSegmentedLine(shape);
+    } else if (shape.type === "polygon" && shape.show) {
+      this.drawPolygon(shape);
+    }
+  }
+
+  drawPolygon(shape) {
+    for (let line of shape.lines) {
+      this.drawSegmentedLine(line);
+    }
+  }
+
+  drawPolygonWEBGL(shape) {
+    for (let line of shape.lines) {
+      this.drawSegmentedLineWEBGL(line);
     }
   }
 
@@ -53,6 +63,8 @@ class Board {
       this.drawSegmentedLineWEBGL(shape);
     } else if (shape.type === "plane" && shape.show) {
       this.drawPlaneWEBGL(shape);
+    } else if (shape.type === "polygon" && shape.show) {
+      this.drawPolygonWEBGL(shape);
     }
   }
 
@@ -393,7 +405,7 @@ class Board {
       -planeHeight / 2 + windowHeight * 0.07
     );
     strokeWeight(0);
-    fill(0, 50, 50, 50);
+    fill(0, 100, 100, 40);
     plane(planeWidth, planeHeight);
     pop();
   }
@@ -403,7 +415,7 @@ class Board {
     const planeWidth = windowHeight * 0.07 + windowWidth / 2;
     const planeHeight = windowHeight * 0.57;
     strokeWeight(0);
-    fill(0, 50, 50, 50);
+    fill(0, 100, 100, 40);
     rotateX(PI / 2);
     translate(
       planeWidth / 2 - windowHeight * 0.07,
@@ -428,7 +440,7 @@ class Board {
   drawPlaneWEBGL(p) {
     push();
     strokeWeight(0);
-    fill(130, 130, 130, 100);
+    fill(...p.color, 40);
     let angle = p.n.angleBetween(createVector(0, 1, 0));
     const rotationAxis = p.n.copy().cross(createVector(0, 1, 0));
 

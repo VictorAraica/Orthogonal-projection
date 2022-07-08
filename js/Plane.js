@@ -29,6 +29,7 @@ class Plane {
 
     this.show = true;
     this.color = [255, 255, 255];
+    this.alpha = 1;
     this.rad = 2;
   }
 
