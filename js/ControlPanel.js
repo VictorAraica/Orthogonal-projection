@@ -117,34 +117,34 @@ class ControlPanel {
       "p2 = (5.3, 7, 1)",
       "p3 = (3, 8, 4)",
       "plane = (p1, p2, p3)",
-      // "l = (p2, p3)",
-      // "aux1 = perpendicularLine(p1, l)",
-      // "A = intersection(l, aux1)",
-      // "aris1 = parallel(p2, aux1)",
-      // "aris2 = perpendicularLine(plane, A)",
-      // "p4 = (10, 8, 3)",
-      // "plane2 = parallel(p4, plane)",
-      // "B = intersection(plane2, aris2)",
-      // "aris3 = parallel(aris2, p2)",
-      // "C = intersection(plane2, aris3)",
-      // "aris4 = parallel(l, p1)",
-      // "D = intersection(aris4, aris1)",
-      // "aris5 = parallel(D, aris3)",
-      // "E = intersection(plane2, aris5)",
-      // "aris6 = parallel(p1, aris3)",
-      // "F = intersection(plane2, aris6)",
-      // "a1 = segment(p1, A)",
-      // "a2 = segment(p1, D)",
-      // "a3 = segment(p1, F)",
-      // "a4 = segment(p2, D)",
-      // "a5 = segment(p2, A)",
-      // "a6 = segment(p2, C)",
-      // "a7 = segment(A, B)",
-      // "a8 = segment(B, C)",
-      // "a9 = segment(B, F)",
-      // "a10 = segment(E, F)",
-      // "a11 = segment(E, D)",
-      // "a12 = segment(E, C)",
+      "l = (p2, p3)",
+      "aux1 = perpendicularLine(p1, l)",
+      "A = intersection(l, aux1)",
+      "aris1 = parallel(p2, aux1)",
+      "aris2 = perpendicularLine(plane, A)",
+      "p4 = (10, 8, 3)",
+      "plane2 = parallel(p4, plane)",
+      "B = intersection(plane2, aris2)",
+      "aris3 = parallel(aris2, p2)",
+      "C = intersection(plane2, aris3)",
+      "aris4 = parallel(l, p1)",
+      "D = intersection(aris4, aris1)",
+      "aris5 = parallel(D, aris3)",
+      "E = intersection(plane2, aris5)",
+      "aris6 = parallel(p1, aris3)",
+      "F = intersection(plane2, aris6)",
+      "a1 = segment(p1, A)",
+      "a2 = segment(p1, D)",
+      "a3 = segment(p1, F)",
+      "a4 = segment(p2, D)",
+      "a5 = segment(p2, A)",
+      "a6 = segment(p2, C)",
+      "a7 = segment(A, B)",
+      "a8 = segment(B, C)",
+      "a9 = segment(B, F)",
+      "a10 = segment(E, F)",
+      "a11 = segment(E, D)",
+      "a12 = segment(E, C)",
     ];
 
     for (let command of commands) {
@@ -154,7 +154,9 @@ class ControlPanel {
     for (let i = 0; i < this.inputs.length; i++) {
       this.inputs[i].input.value = commands[i];
       this.updateInput(i);
+      
     }
+
   }
 
   // -------------------------------------------------------------------------
