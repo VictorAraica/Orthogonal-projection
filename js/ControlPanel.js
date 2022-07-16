@@ -15,6 +15,7 @@ class ControlPanel {
     // shape
     // show
     // optionsButton
+    // optionsOpen
     // }
     this.inputs = [];
     this.functions = [
@@ -67,6 +68,10 @@ class ControlPanel {
         rgb: [251, 191, 36],
         tailwind: "bg-amber-400",
       },
+      {
+        rgb: [250, 250, 250],
+        tailwind: "bg-neutral-50",
+      },
     ];
 
     // size of controls container
@@ -102,9 +107,7 @@ class ControlPanel {
 
     this.optionsButton = document.createElement("button");
     this.optionsButton.className =
-      "flex justify-center content-center h-full p-2 relative overflow-visible button";
-    this.optionsButton.innerHTML +=
-      '<i class="material-icons text-neutral-400 icon">more_vert</i>';
+      "relative flex justify-center content-center h-full p-2 relative overflow-visible";
 
     // -----------------------------------------------------------------------------------
 
@@ -154,43 +157,52 @@ class ControlPanel {
     for (let i = 0; i < this.inputs.length; i++) {
       this.inputs[i].input.value = commands[i];
       this.updateInput(i);
-      
     }
-
   }
 
   // -------------------------------------------------------------------------
 
   openColorOptions(e, index) {
-    // if the target is not part of the original small button then dont open a new colors window
-    // to make sure you dont open multiple color windows
-    if (
-      !e.target.classList.contains("button") &&
-      !e.target.classList.contains("icon")
-    ) {
+    if (this.inputs[index].optionsOpen) {
       return false;
     }
 
     // create the container element
     let optionsContainer = document.createElement("div");
-    optionsContainer.className = `fixed bg-white z-50 translate-x-1/2 translate-y-3 
+    optionsContainer.className = `fixed bg-white
                                   grid grid-cols-${this.colors.length} gap-1 p-1.5 
-                                  border border-gray-500 colorContainer cursor-default`;
+                                  border border-gray-500 cursor-default`;
+    optionsContainer.id = `colorContainer${index}`;
+
+    optionsContainer.style.left = e.clientX + 25 + "px";
+    optionsContainer.style.top = e.clientY + "px";
 
     // add a click event to the document, if click outside the button remove the colors element
     let onOutsideClickHandler = (e) => {
       if (
-        !e.target.classList.contains("colorButton") &&
-        !e.target.classList.contains("colorContainer") &&
-        !e.target.classList.contains("button") &&
-        !e.target.classList.contains("icon")
+        e.target.id !== `colorButton${index}` &&
+        e.target.id !== `colorContainer${index}` &&
+        e.target.id !== `button${index}` &&
+        e.target.id !== `icon${index}`
       ) {
         optionsContainer.remove();
+        this.inputs[index].optionsOpen = false;
         document.removeEventListener("click", onOutsideClickHandler, false);
       }
     };
 
     document.addEventListener("click", onOutsideClickHandler);
+
+    controlsContainer.addEventListener(
+      "scroll",
+      () => {
+        optionsContainer.remove();
+        this.inputs[index].optionsOpen = false;
+      },
+      {
+        once: true,
+      }
+    );
 
     // create all the color buttons
     for (let i = 5; i > 0; i--) {
@@ -198,7 +210,8 @@ class ControlPanel {
         let colorButton = document.createElement("button");
         colorButton.className = `w-4 h-4 ${color.tailwind} opacity-${
           i * 20
-        } colorButton`;
+        } border border-neutral-800`;
+        colorButton.id = `colorButton${index}`;
         optionsContainer.appendChild(colorButton);
 
         colorButton.onclick = () => {
@@ -211,6 +224,7 @@ class ControlPanel {
 
     // append the container element to the button
     this.inputs[index].optionsButton.appendChild(optionsContainer);
+    this.inputs[index].optionsOpen = true;
   }
 
   // -------------------------------------------------------------------------
@@ -628,6 +642,9 @@ class ControlPanel {
     let input = this.inputElement.cloneNode(true);
     let inputContainer = this.inputContainer.cloneNode(true);
     let optionsButton = this.optionsButton.cloneNode(true);
+    optionsButton.id = `button${this.inputs.length}`;
+    optionsButton.innerHTML += `<i class="material-icons text-neutral-400" id="icon${this.inputs.length}">more_vert</i>`;
+
     let inputVisibilityElement = this.inputVisibilityElement.cloneNode(true);
 
     input.addEventListener("blur", (e) => this.updateInput(e.target.index));
