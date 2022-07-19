@@ -23,7 +23,7 @@ class Point {
     this.show = true;
 
     this.rad = 7;
-    this.color = [255, 255, 255];
+    this.color = [250, 250, 250];
     this.alpha = 1;
   }
 }

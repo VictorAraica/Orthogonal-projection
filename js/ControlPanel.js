@@ -1,9 +1,3 @@
-{
-  /* <button class="flex justify-center content-center w-full border-b border-gray-600 p-1">
-  <i class="material-icons text-neutral-400">more_vert</i>
-</button>; */
-}
-
 class ControlPanel {
   constructor(controlsContainer, addButton, board) {
     this.controlsContainer = controlsContainer;
@@ -16,6 +10,7 @@ class ControlPanel {
     // show
     // optionsButton
     // optionsOpen
+    // visibilityButton
     // }
     this.inputs = [];
     this.functions = [
@@ -93,7 +88,9 @@ class ControlPanel {
 
     this.inputVisibilityElement = document.createElement("div");
     this.inputVisibilityElement.className =
-      "rounded-full border-2 border-black bg-black w-5 h-5 m-2 cursor-pointer bg-opacity-70 shrink-0";
+      "rounded-full border-2 w-5 h-5 m-2 cursor-pointer shrink-0";
+    this.inputVisibilityElement.style.background = "rgba(0,0,0, 0.7)";
+    this.inputVisibilityElement.style.borderColor = "rgba(0,0,0)";
 
     // -----------------------------------------------------------------------------------
 
@@ -162,7 +159,7 @@ class ControlPanel {
 
   // -------------------------------------------------------------------------
 
-  openColorOptions(e, index) {
+  openColorOptions({ clientX, clientY }, index) {
     if (this.inputs[index].optionsOpen) {
       return false;
     }
@@ -174,16 +171,16 @@ class ControlPanel {
                                   border border-gray-500 cursor-default`;
     optionsContainer.id = `colorContainer${index}`;
 
-    optionsContainer.style.left = e.clientX + 25 + "px";
-    optionsContainer.style.top = e.clientY + "px";
+    optionsContainer.style.left = clientX + 25 + "px";
+    optionsContainer.style.top = clientY + "px";
 
     // add a click event to the document, if click outside the button remove the colors element
-    let onOutsideClickHandler = (e) => {
+    let onOutsideClickHandler = ({ target }) => {
       if (
-        e.target.id !== `colorButton${index}` &&
-        e.target.id !== `colorContainer${index}` &&
-        e.target.id !== `button${index}` &&
-        e.target.id !== `icon${index}`
+        target.id !== `colorButton${index}` &&
+        target.id !== `colorContainer${index}` &&
+        target.id !== `button${index}` &&
+        target.id !== `icon${index}`
       ) {
         optionsContainer.remove();
         this.inputs[index].optionsOpen = false;
@@ -218,6 +215,19 @@ class ControlPanel {
           this.inputs[index].shape.color = color.rgb.map(
             (x) => (x * (i * 2)) / 10
           );
+          this.visibilityToggle(
+            {
+              target: this.inputs[index].visibilityButton,
+            },
+            index
+          );
+
+          this.visibilityToggle(
+            {
+              target: this.inputs[index].visibilityButton,
+            },
+            index
+          );
         };
       }
     }
@@ -233,7 +243,14 @@ class ControlPanel {
     // console.log(this.inputs[15]);
   }
 
-  visibilityToggle(e, index) {
+  visibilityToggle({ target }, index) {
+    // get color of shape
+    let color = this.inputs[index].shape.color;
+    // if the color is white then make the button black
+    if (color[0] === 250 && color[1] === 250 && color[2] === 250) {
+      color = [0, 0, 0];
+    }
+
     if (this.inputs[index].show) {
       if (this.inputs[index].shape.constructor.name === "Array") {
         for (let shape of this.inputs[index].shape) shape.show = false;
@@ -241,10 +258,8 @@ class ControlPanel {
         this.inputs[index].shape.show = false;
       }
       this.inputs[index].show = false;
-      e.target.className = e.target.className.replace(
-        "bg-opacity-70",
-        "bg-opacity-10"
-      );
+
+      target.style.background = `rgba(${color.join(", ")}, 0.3)`;
     } else {
       if (this.inputs[index].shape.constructor.name === "Array") {
         for (let shape of this.inputs[index].shape) shape.show = true;
@@ -252,10 +267,7 @@ class ControlPanel {
         this.inputs[index].shape.show = true;
       }
       this.inputs[index].show = true;
-      e.target.className = e.target.className.replace(
-        "bg-opacity-10",
-        "bg-opacity-70"
-      );
+      target.style.background = `rgba(${color.join(", ")}, 0.7)`;
     }
   }
 
@@ -671,6 +683,7 @@ class ControlPanel {
       command: command,
       show: true,
       optionsButton,
+      visibilityButton: inputVisibilityElement,
     });
     input.focus();
 

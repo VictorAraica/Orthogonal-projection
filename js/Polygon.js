@@ -36,7 +36,7 @@ class Polygon {
     }
 
     this.show = true;
-    this.color = [255, 255, 255];
+    this.color = [250, 250, 250];
     this.alpha = 1;
     this.width = 2;
   }
