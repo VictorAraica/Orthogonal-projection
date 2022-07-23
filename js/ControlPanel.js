@@ -1,13 +1,19 @@
 class ControlPanel {
   constructor(controlsContainer, addButton, board) {
     this.controlsContainer = controlsContainer;
+    this.board = board;
+
+    // controlsContainer.addEventListener(
+    //   "resize",
+    //   () => this.board.xLimit = controlsContainer.offsetWidth
+    // );
+
     this.addButton = addButton;
     // {
     // command: input value
     // dependencies: list of shapes that depend on this one
     // name
     // shape
-    // show
     // optionsButton
     // optionsOpen
     // visibilityButton
@@ -23,8 +29,8 @@ class ControlPanel {
       "trazaV",
       "triangle",
       "pentagon",
+      "cone",
     ];
-    this.board = board;
 
     this.colors = [
       {
@@ -113,38 +119,42 @@ class ControlPanel {
     };
 
     let commands = [
-      "p1 = (1, 4, 4)",
-      "p2 = (5.3, 7, 1)",
-      "p3 = (3, 8, 4)",
+      "p1 = (1, 8, 4)",
+      "p2 = (5.3, 11, 1)",
+      "p3 = (3, 12, 4)",
       "plane = (p1, p2, p3)",
-      "l = (p2, p3)",
-      "aux1 = perpendicularLine(p1, l)",
-      "A = intersection(l, aux1)",
-      "aris1 = parallel(p2, aux1)",
-      "aris2 = perpendicularLine(plane, A)",
-      "p4 = (10, 8, 3)",
-      "plane2 = parallel(p4, plane)",
-      "B = intersection(plane2, aris2)",
-      "aris3 = parallel(aris2, p2)",
-      "C = intersection(plane2, aris3)",
-      "aris4 = parallel(l, p1)",
-      "D = intersection(aris4, aris1)",
-      "aris5 = parallel(D, aris3)",
-      "E = intersection(plane2, aris5)",
-      "aris6 = parallel(p1, aris3)",
-      "F = intersection(plane2, aris6)",
-      "a1 = segment(p1, A)",
-      "a2 = segment(p1, D)",
-      "a3 = segment(p1, F)",
-      "a4 = segment(p2, D)",
-      "a5 = segment(p2, A)",
-      "a6 = segment(p2, C)",
-      "a7 = segment(A, B)",
-      "a8 = segment(B, C)",
-      "a9 = segment(B, F)",
-      "a10 = segment(E, F)",
-      "a11 = segment(E, D)",
-      "a12 = segment(E, C)",
+
+      "p4 = (10, 2, 10)",
+
+      "cone = cone(p4, plane, p1, p2)",
+      // "l = (p2, p3)",
+      // "aux1 = perpendicularLine(p1, l)",
+      // "A = intersection(l, aux1)",
+      // "aris1 = parallel(p2, aux1)",
+      // "aris2 = perpendicularLine(plane, A)",
+      // "p4 = (10, 8, 3)",
+      // "plane2 = parallel(p4, plane)",
+      // "B = intersection(plane2, aris2)",
+      // "aris3 = parallel(aris2, p2)",
+      // "C = intersection(plane2, aris3)",
+      // "aris4 = parallel(l, p1)",
+      // "D = intersection(aris4, aris1)",
+      // "aris5 = parallel(D, aris3)",
+      // "E = intersection(plane2, aris5)",
+      // "aris6 = parallel(p1, aris3)",
+      // "F = intersection(plane2, aris6)",
+      // "a1 = segment(p1, A)",
+      // "a2 = segment(p1, D)",
+      // "a3 = segment(p1, F)",
+      // "a4 = segment(p2, D)",
+      // "a5 = segment(p2, A)",
+      // "a6 = segment(p2, C)",
+      // "a7 = segment(A, B)",
+      // "a8 = segment(B, C)",
+      // "a9 = segment(B, F)",
+      // "a10 = segment(E, F)",
+      // "a11 = segment(E, D)",
+      // "a12 = segment(E, C)",
     ];
 
     for (let command of commands) {
@@ -157,13 +167,7 @@ class ControlPanel {
     }
   }
 
-  // -------------------------------------------------------------------------
-
-  openColorOptions({ clientX, clientY }, index) {
-    if (this.inputs[index].optionsOpen) {
-      return false;
-    }
-
+  getColorOptionsContainer(clientX, clientY, index) {
     // create the container element
     let optionsContainer = document.createElement("div");
     optionsContainer.className = `fixed bg-white
@@ -190,6 +194,7 @@ class ControlPanel {
 
     document.addEventListener("click", onOutsideClickHandler);
 
+    // if scroll the controls panel remove color options
     controlsContainer.addEventListener(
       "scroll",
       () => {
@@ -201,6 +206,10 @@ class ControlPanel {
       }
     );
 
+    return optionsContainer;
+  }
+
+  fillColorOptionsContainer(optionsContainer, index) {
     // create all the color buttons
     for (let i = 5; i > 0; i--) {
       for (let color of this.colors) {
@@ -231,13 +240,25 @@ class ControlPanel {
         };
       }
     }
+  }
+
+  openColorOptions({ clientX, clientY }, index) {
+    if (this.inputs[index].optionsOpen) {
+      return false;
+    }
+
+    let optionsContainer = this.getColorOptionsContainer(
+      clientX,
+      clientY,
+      index
+    );
+
+    this.fillColorOptionsContainer(optionsContainer, index);
 
     // append the container element to the button
     this.inputs[index].optionsButton.appendChild(optionsContainer);
     this.inputs[index].optionsOpen = true;
   }
-
-  // -------------------------------------------------------------------------
 
   test() {
     // console.log(this.inputs[15]);
@@ -308,6 +329,7 @@ class ControlPanel {
       const shape1 = this.inputs.find((element) => element.name === data[0]);
       const shape2 = this.inputs.find((element) => element.name === data[1]);
       const shape3 = this.inputs.find((element) => element.name === data[2]);
+
       if (!shape1 || !shape2 || !shape3) {
         return "argument not found";
       }
@@ -452,17 +474,12 @@ class ControlPanel {
     let inputs = parameters.map((parameter) => {
       return this.inputs.find((element) => element.name === parameter);
     });
-    let polygon;
-    try {
-      polygon = new Polygon(
-        parameters[0],
-        inputs[1].shape,
-        inputs[2].shape,
-        inputs[3].shape
-      );
-    } catch {
-      return "error creating the shape";
-    }
+    let polygon = new Polygon(
+      parameters[0],
+      inputs[1].shape,
+      inputs[2].shape,
+      inputs[3].shape
+    );
 
     let names = polygon.points.map((_, i) => `${name}${i}`);
 
@@ -493,6 +510,23 @@ class ControlPanel {
     return "error creating the shape";
   }
 
+  cone(index, vertex, plane, center, generatriz) {
+    let shape = new Cone(
+      vertex.shape,
+      plane.shape,
+      center.shape,
+      generatriz.shape,
+
+      this.board.cellSizeWEBGL
+    );
+
+    if (shape) {
+      this.addDependencies(index, [vertex, plane, center, generatriz]);
+      return shape;
+    }
+    return false;
+  }
+
   functionToShape(index, functionName, parameters) {
     let shape = "error creating the shape";
     if (!functionName in this.functions) {
@@ -517,6 +551,8 @@ class ControlPanel {
       shape = this.trazaH(index, inputs[0]);
     } else if (functionName === "trazaV") {
       shape = this.trazaV(index, inputs[0]);
+    } else if (functionName === "cone") {
+      shape = this.cone(index, inputs[0], inputs[1], inputs[2], inputs[3]);
     }
 
     return shape;
@@ -626,15 +662,21 @@ class ControlPanel {
     }
 
     // ---------------------------------------------
+
+    let color = [250, 250, 250];
+    let show = true;
+
     // if this input already has a shape then replace it
     if (this.board.shapes[index]) {
+      // get the color and show of the shape if the shape existed
+      color = this.board.shapes[index].color;
+      show = this.board.shapes[index].show;
       this.board.shapes.splice(index, 1);
     }
 
-    // if this input had a show = false then update the shape
-    if (!element.show) {
-      shape.show = false;
-    }
+    // set shape color and show to the old one if it existed
+    shape.color = color;
+    shape.show = show;
 
     element.shape = shape;
     element.name = name;

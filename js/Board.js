@@ -35,18 +35,8 @@ class Board {
       this.drawSegmentedLine(shape);
     } else if (shape.type === "polygon" && shape.show) {
       this.drawPolygon(shape);
-    }
-  }
-
-  drawPolygon(shape) {
-    for (let line of shape.lines) {
-      this.drawSegmentedLine(line);
-    }
-  }
-
-  drawPolygonWEBGL(shape) {
-    for (let line of shape.lines) {
-      this.drawSegmentedLineWEBGL(line);
+    } else if (shape.type === "cone" && shape.show) {
+      this.drawCone(shape);
     }
   }
 
@@ -65,6 +55,8 @@ class Board {
       this.drawPlaneWEBGL(shape);
     } else if (shape.type === "polygon" && shape.show) {
       this.drawPolygonWEBGL(shape);
+    } else if (shape.type === "cone" && shape.show) {
+      this.drawConeWEBGL(shape);
     }
   }
 
@@ -102,7 +94,7 @@ class Board {
     if (mouseX > this.xLimit) {
       const difX = mouseX - pmouseX;
       const difY = mouseY - pmouseY;
-      if (e.ctrlKey) {
+      if (e.ctrlKey || e.buttons === 2) {
         this.translateXWEBGL += difX;
         this.translateYWEBGL += difY;
       } else {
@@ -140,6 +132,11 @@ class Board {
           this.cellSizeWEBGL *= 0.9;
         } else {
           this.cellSizeWEBGL *= 1.1;
+        }
+      }
+      for (let shape of this.shapes) {
+        if (shape.type === "cone") {
+          shape.model = shape.createModel(this.cellSizeWEBGL);
         }
       }
     }
@@ -197,7 +194,7 @@ class Board {
     line(origin.x, origin.y + 15, origin.x, origin.y - 15);
   }
 
-  drawPoint(p) {
+  drawPoint(p, color = undefined) {
     if (typeof p !== "object" || p === null) {
       return false;
     }
@@ -205,7 +202,9 @@ class Board {
     const PH = this.scaleToPixel(p.x, p.y);
     const PV = this.scaleToPixel(p.x, -p.z);
 
-    let color = p.color;
+    if (!color) {
+      color = p.color;
+    }
     let rad = p.rad;
 
     if (this.distanceMousePoint(p) * this.cellSize < 10) {
@@ -220,7 +219,7 @@ class Board {
     point(PV);
   }
 
-  drawSegmentedLine(l) {
+  drawSegmentedLine(l, PH = true, PV = true, color = undefined) {
     if (typeof l !== "object" || l === null) {
       return false;
     }
@@ -230,7 +229,9 @@ class Board {
     const PV1 = this.scaleToPixel(l.p1.x, -l.p1.z);
     const PV2 = this.scaleToPixel(l.p2.x, -l.p2.z);
 
-    let color = l.color;
+    if (!color) {
+      color = l.color;
+    }
     let width = l.width;
 
     const mousePos = this.pixelToScale(pmouseX, pmouseY);
@@ -250,16 +251,18 @@ class Board {
     strokeWeight(width);
     stroke(...color);
 
-    line(PH1.x, PH1.y, PH2.x, PH2.y);
-    line(PV1.x, PV1.y, PV2.x, PV2.y);
+    if (PH) line(PH1.x, PH1.y, PH2.x, PH2.y);
+    if (PV) line(PV1.x, PV1.y, PV2.x, PV2.y);
   }
 
-  drawLine(l) {
+  drawLine(l, color = undefined) {
     if (typeof l !== "object" || l === null) {
       return false;
     }
 
-    let color = l.color;
+    if (!color) {
+      color = l.color;
+    }
     let width = l.width;
 
     if (this.distanceMouseLine(l) * this.cellSize < 10) {
@@ -279,42 +282,17 @@ class Board {
     line(...this.getLineBorderPoints(PV1, PV2));
   }
 
-  getLineBorderPoints(p1, p2) {
-    const m = (p1.y - p2.y) / (p1.x - p2.x);
-
-    if (abs(m) === Infinity) {
-      return [p1.x, 0, p1.x, windowHeight];
+  drawPolygon(shape, color = undefined) {
+    if (!color) {
+      color = shape.color;
     }
-    const y1 = -m * p1.x + p1.y;
-    const y2 = m * windowWidth - m * p1.x + p1.y;
 
-    return [0, y1, windowWidth, y2];
+    for (let line of shape.lines) {
+      this.drawSegmentedLine(line, true, true, color);
+    }
   }
 
-  distanceMousePoint(p) {
-    const mousePos = this.pixelToScale(pmouseX, pmouseY);
-    const distY = Math.sqrt((p.x - mousePos.x) ** 2 + (p.y - mousePos.y) ** 2);
-    const distZ = Math.sqrt((p.x - mousePos.x) ** 2 + (p.z - mousePos.z) ** 2);
-    return Math.min(distY, distZ);
-  }
-
-  distanceMouseLine(l) {
-    const mousePos = this.pixelToScale(pmouseX, pmouseY);
-
-    const distY =
-      Math.abs(
-        l.equationY.a * mousePos.x + l.equationY.b * mousePos.y + l.equationY.c
-      ) / Math.sqrt(l.equationY.a ** 2 + l.equationY.b ** 2);
-
-    const distZ =
-      Math.abs(
-        l.equationZ.a * mousePos.x + l.equationZ.b * mousePos.z + l.equationZ.c
-      ) / Math.sqrt(l.equationZ.a ** 2 + l.equationZ.b ** 2);
-
-    return Math.min(distY, distZ);
-  }
-
-  drawPointWEBGL(p) {
+  drawPointWEBGL(p, color = undefined) {
     if (typeof p !== "object" || p === null) {
       return false;
     }
@@ -324,7 +302,9 @@ class Board {
     const y = -p.z * this.cellSizeWEBGL;
     const z = p.y * this.cellSizeWEBGL;
 
-    let color = p.color;
+    if (!color) {
+      color = p.color;
+    }
     let rad = p.rad;
 
     stroke(...color);
@@ -333,14 +313,17 @@ class Board {
     point(x, y, z);
   }
 
-  drawLineWEBGL(l) {
+  drawLineWEBGL(l, color = undefined) {
     let p1;
     let p2;
     if (typeof l !== "object" || l === null) {
       return false;
     }
 
-    let color = l.color;
+    if (!color) {
+      color = l.color;
+    }
+
     let width = l.width;
 
     if (l.p1.x !== l.p2.x) {
@@ -371,21 +354,23 @@ class Board {
     line(x1, y1, z1, x2, y2, z2);
   }
 
-  drawSegmentedLineWEBGL(l) {
+  drawSegmentedLineWEBGL(l, color = undefined) {
     if (typeof l !== "object" || l === null) {
       return false;
     }
 
-    let color = l.color;
+    if (!color) {
+      color = l.color;
+    }
     let width = l.width;
 
     const x1 = l.p1.x * this.cellSizeWEBGL;
-    // y = z becaus in webgl y is the cota and up is negative
+    // y = z because in webgl y is the cota and up is negative
     const y1 = -l.p1.z * this.cellSizeWEBGL;
     const z1 = l.p1.y * this.cellSizeWEBGL;
 
     const x2 = l.p2.x * this.cellSizeWEBGL;
-    // y = z becaus in webgl y is the cota and up is negative
+    // y = z because in webgl y is the cota and up is negative
     const y2 = -l.p2.z * this.cellSizeWEBGL;
     const z2 = l.p2.y * this.cellSizeWEBGL;
     2;
@@ -394,6 +379,16 @@ class Board {
     stroke(...color);
 
     line(x1, y1, z1, x2, y2, z2);
+  }
+
+  drawPolygonWEBGL(shape, color = undefined) {
+    if (!color) {
+      color = shape.color;
+    }
+
+    for (let line of shape.lines) {
+      this.drawSegmentedLineWEBGL(line, color);
+    }
   }
 
   drawPV() {
@@ -466,5 +461,64 @@ class Board {
 
     plane(this.cellSizeWEBGL * 35, this.cellSizeWEBGL * 35);
     pop();
+  }
+
+  getLineBorderPoints(p1, p2) {
+    const m = (p1.y - p2.y) / (p1.x - p2.x);
+
+    if (abs(m) === Infinity) {
+      return [p1.x, 0, p1.x, windowHeight];
+    }
+    const y1 = -m * p1.x + p1.y;
+    const y2 = m * windowWidth - m * p1.x + p1.y;
+
+    return [0, y1, windowWidth, y2];
+  }
+
+  distanceMousePoint(p) {
+    const mousePos = this.pixelToScale(pmouseX, pmouseY);
+    const distY = Math.sqrt((p.x - mousePos.x) ** 2 + (p.y - mousePos.y) ** 2);
+    const distZ = Math.sqrt((p.x - mousePos.x) ** 2 + (p.z - mousePos.z) ** 2);
+    return Math.min(distY, distZ);
+  }
+
+  distanceMouseLine(l) {
+    const mousePos = this.pixelToScale(pmouseX, pmouseY);
+
+    const distY =
+      Math.abs(
+        l.equationY.a * mousePos.x + l.equationY.b * mousePos.y + l.equationY.c
+      ) / Math.sqrt(l.equationY.a ** 2 + l.equationY.b ** 2);
+
+    const distZ =
+      Math.abs(
+        l.equationZ.a * mousePos.x + l.equationZ.b * mousePos.z + l.equationZ.c
+      ) / Math.sqrt(l.equationZ.a ** 2 + l.equationZ.b ** 2);
+
+    return Math.min(distY, distZ);
+  }
+
+  drawCone(c) {
+    this.drawPolygon(c.base, c.color);
+
+    if (c.PHLines) {
+      for (let l of c.PHLines) {
+        this.drawSegmentedLine(l, true, false, c.color);
+      }
+    }
+
+    if (c.PVLines) {
+      for (let l of c.PVLines) {
+        this.drawSegmentedLine(l, false, true, c.color);
+      }
+    }
+  }
+
+  drawConeWEBGL(c) {
+    push();
+    strokeWeight(0);
+    fill(...c.color, 40);
+    model(c.model);
+    this.drawPolygonWEBGL(c.base, c.color);
   }
 }

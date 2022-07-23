@@ -3,37 +3,39 @@ ctrl rueda zoom a la escena completa
 ctrl click mueve la escena
 
 
-nombre = a, b, c                   			crea un punto
-nombre = punto1, punto2            			crea recta
-nombre = segment(punto1, punto2)   			crea un segmento de recta
-nombre = punto1, punto2, punto3    			crea un plano
+nombre = a, b, c                   			                            crea un punto
+nombre = punto1, punto2            			                            crea recta
+nombre = segment(punto1, punto2)   			                            crea un segmento de recta
+nombre = punto1, punto2, punto3    			                            crea un plano
 
-nombre = intersection(recta1, recta2) 		punto interseccion de 2 rectas
+nombre = intersection(recta1, recta2) 		                            punto interseccion de 2 rectas
 
-nombre = intersection(plano, recta) 		punto interseccion de plano recta
-nombre = intersection(recta, recta) 		punto interseccion de plano recta
+nombre = intersection(plano, recta) 		                            punto interseccion de plano recta
+nombre = intersection(recta, recta) 		                            punto interseccion de plano recta
 
-nombre = intersection(plano, plano) 		punto interseccion de plano plano
+nombre = intersection(plano, plano) 		                            punto interseccion de plano plano
 
-nombre = parallel(punto, recta)			    paralela a recta que pasa por un punto
-nombre = parallel(recta, punto)			    paralela a recta que pasa por un punto
+nombre = parallel(punto, recta)			                                paralela a recta que pasa por un punto
+nombre = parallel(recta, punto)			                                paralela a recta que pasa por un punto
 
-nombre = parallel(plano, punto)			    plano paralelo que pasa por un punto
-nombre = parallel(punto, plano)			    plano paralelo que pasa por un punto
+nombre = parallel(plano, punto)			                                plano paralelo que pasa por un punto
+nombre = parallel(punto, plano)			                                plano paralelo que pasa por un punto
 
-nombre = perpendicularLine(punto, recta)  	perpendicular a recta que pasa por punto
-nombre = perpendicularLine(recta, punto)  	perpendicular a recta que pasa por punto
+nombre = perpendicularLine(punto, recta)  	                            perpendicular a recta que pasa por punto
+nombre = perpendicularLine(recta, punto)  	                            perpendicular a recta que pasa por punto
 
-nombre = perpendicularLine(plano, punto)  	perpendicular a plano que pasa por punto
-nombre = perpendicularLine(punto, plano)  	perpendicular a plano que pasa por punto
+nombre = perpendicularLine(plano, punto)  	                            perpendicular a plano que pasa por punto
+nombre = perpendicularLine(punto, plano)  	                            perpendicular a plano que pasa por punto
 
-nombre = perpendicularPlane(recta, punto) 	plano perpendicular a una recta que pasa por un punto
-nombre = perpendicularPlane(punto, recta) 	plano perpendicular a una recta que pasa por un punto
+nombre = perpendicularPlane(recta, punto) 	                            plano perpendicular a una recta que pasa por un punto
+nombre = perpendicularPlane(punto, recta) 	                            plano perpendicular a una recta que pasa por un punto
 
-nombre = trazaH(recta) 	                    traza horizontal de la recta
-nombre = trazaV(recta) 	                    traza vertical de la recta
+nombre = trazaH(recta) 	                                                traza horizontal de la recta
+nombre = trazaV(recta) 	                                                traza vertical de la recta
 
-nombre = trazaH(plano) 	                    traza horizontal del plano
-nombre = trazaV(plano) 	                    traza vertical del plano
+nombre = trazaH(plano) 	                                                traza horizontal del plano
+nombre = trazaV(plano) 	                                                traza vertical del plano
 
-nombre = polygon(lados, plano, centro, vertice) 
+nombre = polygon(lados, plano, centro, vertice)                         poligono regular, devuelve las lineas del poligono y crea nuevos puntos con los vertices
+
+nombre = cone(vertice, plano, centro, punto_de_la_generatriz)           crea un cono con el plano de la base, el vertice, centro y un punto de la generatriz

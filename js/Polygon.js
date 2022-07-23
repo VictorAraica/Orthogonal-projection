@@ -3,6 +3,7 @@ class Polygon {
     this.type = "polygon";
     this.points = [];
     this.lines = [];
+    this.center = center;
     let v = vertex.vector.copy().sub(center.vector);
     let axis = plane.n.copy().normalize();
     let rotatedVector;
@@ -25,7 +26,6 @@ class Polygon {
       this.points.push(new Point(center.vector.copy().add(rotatedVector)));
     }
 
-    // this.addDependencies(index, [plane, center, vertex]);
     for (let i = 0; i < this.points.length; i++) {
       this.lines.push(
         new SegmentedLine(

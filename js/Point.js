@@ -20,6 +20,7 @@ class Point {
       this.z = args[0].z;
       this.vector = args[0];
     }
+
     this.show = true;
 
     this.rad = 7;

@@ -9,6 +9,7 @@ const WEBGLButton = document.getElementById("WEBGL-toggle-button");
 
 function setup() {
   const renderer = createCanvas(windowWidth, windowHeight, WEBGL);
+  renderer.elt.addEventListener("contextmenu", (e) => e.preventDefault());
   renderer.drawingContext.disable(renderer.drawingContext.DEPTH_TEST);
 
   board = new Board();
@@ -55,9 +56,9 @@ function mouseDragged(e) {
   }
 }
 
-function mouseClicked() {
-  controlPanel.test();
-}
+// function mouseClicked(e) {
+//   controlPanel.test();
+// }
 
 function mouseWheel(e) {
   if (!board.WEBGL) {
