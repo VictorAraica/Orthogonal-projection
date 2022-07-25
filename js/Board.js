@@ -139,7 +139,7 @@ class Board {
         }
       }
       for (let shape of this.shapes) {
-        if (shape.type === "cone") {
+        if (shape.type === "cone" || shape.type === "pyramid") {
           shape.model = shape.createModel(this.cellSizeWEBGL);
         }
       }
