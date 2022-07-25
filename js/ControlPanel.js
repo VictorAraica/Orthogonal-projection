@@ -27,9 +27,8 @@ class ControlPanel {
       "perpendicularPlane",
       "trazaH",
       "trazaV",
-      "triangle",
-      "pentagon",
       "cone",
+      "pyramid",
     ];
 
     this.colors = [
@@ -126,7 +125,7 @@ class ControlPanel {
 
       "p4 = (10, 2, 10)",
 
-      "cone = cone(p4, plane, p1, p2)",
+      "pyramid = pyramid(5, p4, plane, p1, p2)",
       // "l = (p2, p3)",
       // "aux1 = perpendicularLine(p1, l)",
       // "A = intersection(l, aux1)",
@@ -516,7 +515,6 @@ class ControlPanel {
       plane.shape,
       center.shape,
       generatriz.shape,
-
       this.board.cellSizeWEBGL
     );
 
@@ -524,6 +522,24 @@ class ControlPanel {
       this.addDependencies(index, [vertex, plane, center, generatriz]);
       return shape;
     }
+    return false;
+  }
+
+  pyramid(index, sides, vertex, plane, center, generatriz) {
+    let shape = new Pyramid(
+      sides,
+      vertex.shape,
+      plane.shape,
+      center.shape,
+      generatriz.shape,
+      this.board.cellSizeWEBGL
+    );
+
+    if (shape) {
+      this.addDependencies(index, [vertex, plane, center, generatriz]);
+      return shape;
+    }
+
     return false;
   }
 
@@ -538,28 +554,31 @@ class ControlPanel {
     });
 
     if (functionName === "intersection") {
-      shape = this.intersection(index, inputs[0], inputs[1]);
+      shape = this.intersection(index, ...inputs);
     } else if (functionName === "parallel") {
-      shape = this.parallel(index, inputs[0], inputs[1]);
+      shape = this.parallel(index, ...inputs);
     } else if (functionName === "perpendicularLine") {
-      shape = this.perpendicularLine(index, inputs[0], inputs[1]);
+      shape = this.perpendicularLine(index, ...inputs);
     } else if (functionName === "perpendicularPlane") {
-      shape = this.perpendicularPlane(index, inputs[0], inputs[1]);
+      shape = this.perpendicularPlane(index, ...inputs);
     } else if (functionName === "segment") {
-      shape = this.segmentedLine(index, inputs[0], inputs[1]);
+      shape = this.segmentedLine(index, ...inputs);
     } else if (functionName === "trazaH") {
-      shape = this.trazaH(index, inputs[0]);
+      shape = this.trazaH(index, ...inputs);
     } else if (functionName === "trazaV") {
-      shape = this.trazaV(index, inputs[0]);
+      shape = this.trazaV(index, ...inputs);
     } else if (functionName === "cone") {
-      shape = this.cone(index, inputs[0], inputs[1], inputs[2], inputs[3]);
+      shape = this.cone(index, ...inputs);
+    } else if (functionName === "pyramid") {
+      inputs.shift();
+      shape = this.pyramid(index, parameters[0], ...inputs);
     }
 
     return shape;
   }
 
   getNameAndData(value) {
-    value = value.replace(/ /g, "");
+    value = value.replace(/\s/g, "");
 
     const splited = value.split("=");
 

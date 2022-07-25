@@ -37,6 +37,8 @@ class Board {
       this.drawPolygon(shape);
     } else if (shape.type === "cone" && shape.show) {
       this.drawCone(shape);
+    } else if (shape.type === "pyramid" && shape.show) {
+      this.drawPyramid(shape);
     }
   }
 
@@ -57,6 +59,8 @@ class Board {
       this.drawPolygonWEBGL(shape);
     } else if (shape.type === "cone" && shape.show) {
       this.drawConeWEBGL(shape);
+    } else if (shape.type === "pyramid" && shape.show) {
+      this.drawPyramidWEBGL(shape);
     }
   }
 
@@ -520,5 +524,22 @@ class Board {
     fill(...c.color, 40);
     model(c.model);
     this.drawPolygonWEBGL(c.base, c.color);
+    pop();
+  }
+
+  drawPyramid(p) {
+    for (let l of p.edges) {
+      this.drawSegmentedLine(l);
+    }
+  }
+  drawPyramidWEBGL(p) {
+    for (let l of p.edges) {
+      this.drawSegmentedLineWEBGL(l);
+    }
+    push();
+    strokeWeight(0);
+    fill(...p.color, 40);
+    model(p.model);
+    pop();
   }
 }
