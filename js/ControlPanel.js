@@ -126,6 +126,8 @@ class ControlPanel {
       "p4 = (10, 2, 10)",
 
       "pyramid = pyramid(5, p4, plane, p1, p2)",
+
+      "l = (p1, p2)",
       // "l = (p2, p3)",
       // "aux1 = perpendicularLine(p1, l)",
       // "A = intersection(l, aux1)",
@@ -210,19 +212,25 @@ class ControlPanel {
 
   fillColorOptionsContainer(optionsContainer, index) {
     // create all the color buttons
-    for (let i = 5; i > 0; i--) {
+    const alphaLevels = 10;
+    for (let alphaLevel = alphaLevels; alphaLevel > 0; alphaLevel--) {
       for (let color of this.colors) {
         let colorButton = document.createElement("button");
         colorButton.className = `w-4 h-4 ${color.tailwind} opacity-${
-          i * 20
+          alphaLevel * 10
         } border border-neutral-800`;
         colorButton.id = `colorButton${index}`;
         optionsContainer.appendChild(colorButton);
 
         colorButton.onclick = () => {
-          this.inputs[index].shape.color = color.rgb.map(
-            (x) => (x * (i * 2)) / 10
-          );
+          // this.inputs[index].shape.color = color.rgb.map(
+          //   (x) => (x * (alphaLevel * 2)) / 10
+          // );
+          this.inputs[index].shape.color = [
+            ...color.rgb,
+            (alphaLevel * 255) / alphaLevels,
+          ];
+
           this.visibilityToggle(
             {
               target: this.inputs[index].visibilityButton,
@@ -265,7 +273,8 @@ class ControlPanel {
 
   visibilityToggle({ target }, index) {
     // get color of shape
-    let color = this.inputs[index].shape.color;
+    let color = [...this.inputs[index].shape.color];
+    color.splice(-1);
     // if the color is white then make the button black
     if (color[0] === 250 && color[1] === 250 && color[2] === 250) {
       color = [0, 0, 0];
@@ -681,21 +690,14 @@ class ControlPanel {
     }
 
     // ---------------------------------------------
-
-    let color = [250, 250, 250];
-    let show = true;
-
+    shape.show = true;
     // if this input already has a shape then replace it
     if (this.board.shapes[index]) {
       // get the color and show of the shape if the shape existed
-      color = this.board.shapes[index].color;
-      show = this.board.shapes[index].show;
+      shape.color = this.board.shapes[index].color;
+      shape.show = this.board.shapes[index].show;
       this.board.shapes.splice(index, 1);
     }
-
-    // set shape color and show to the old one if it existed
-    shape.color = color;
-    shape.show = show;
 
     element.shape = shape;
     element.name = name;

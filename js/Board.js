@@ -206,9 +206,10 @@ class Board {
     const PH = this.scaleToPixel(p.x, p.y);
     const PV = this.scaleToPixel(p.x, -p.z);
 
-    if (!color) {
-      color = p.color;
-    }
+    color = color ? color : p.color;
+
+    color = this.alphaToColor(color);
+
     let rad = p.rad;
 
     if (this.distanceMousePoint(p) * this.cellSize < 10) {
@@ -228,14 +229,15 @@ class Board {
       return false;
     }
 
+    color = color ? color : l.color;
+
+    color = this.alphaToColor(color);
+
     const PH1 = this.scaleToPixel(l.p1.x, l.p1.y);
     const PH2 = this.scaleToPixel(l.p2.x, l.p2.y);
     const PV1 = this.scaleToPixel(l.p1.x, -l.p1.z);
     const PV2 = this.scaleToPixel(l.p2.x, -l.p2.z);
 
-    if (!color) {
-      color = l.color;
-    }
     let width = l.width;
 
     const mousePos = this.pixelToScale(pmouseX, pmouseY);
@@ -264,13 +266,14 @@ class Board {
       return false;
     }
 
-    if (!color) {
-      color = l.color;
-    }
+    color = color ? color : l.color;
+
+    color = this.alphaToColor(color);
+
     let width = l.width;
 
     if (this.distanceMouseLine(l) * this.cellSize < 10) {
-      color = [0, 255, 0];
+      color = [0, 255, 0, 20];
       width *= 2;
     }
 
@@ -287,9 +290,7 @@ class Board {
   }
 
   drawPolygon(shape, color = undefined) {
-    if (!color) {
-      color = shape.color;
-    }
+    color = color ? color : shape.color;
 
     for (let line of shape.lines) {
       this.drawSegmentedLine(line, true, true, color);
@@ -306,9 +307,9 @@ class Board {
     const y = -p.z * this.cellSizeWEBGL;
     const z = p.y * this.cellSizeWEBGL;
 
-    if (!color) {
-      color = p.color;
-    }
+    color = color ? color : p.color;
+    color = this.alphaToColor(color);
+
     let rad = p.rad;
 
     stroke(...color);
@@ -324,9 +325,8 @@ class Board {
       return false;
     }
 
-    if (!color) {
-      color = l.color;
-    }
+    color = color ? color : l.color;
+    color = this.alphaToColor(color);
 
     let width = l.width;
 
@@ -363,9 +363,9 @@ class Board {
       return false;
     }
 
-    if (!color) {
-      color = l.color;
-    }
+    color = color ? color : l.color;
+    color = this.alphaToColor(color);
+
     let width = l.width;
 
     const x1 = l.p1.x * this.cellSizeWEBGL;
@@ -386,9 +386,7 @@ class Board {
   }
 
   drawPolygonWEBGL(shape, color = undefined) {
-    if (!color) {
-      color = shape.color;
-    }
+    color = color ? color : shape.color;
 
     for (let line of shape.lines) {
       this.drawSegmentedLineWEBGL(line, color);
@@ -429,17 +427,20 @@ class Board {
     stroke(255, 0, 0);
     strokeWeight(3);
     line(-windowHeight * 0.07, 0, 0, windowWidth / 2, 0, 0);
-    stroke(0, 255, 0);
-    line(0, windowHeight * 0.07, 0, 0, -windowHeight / 2, 0);
     stroke(0, 0, 255);
+    line(0, windowHeight * 0.07, 0, 0, -windowHeight / 2, 0);
+    stroke(0, 255, 0);
     line(0, 0, -windowHeight * 0.07, 0, 0, windowHeight / 2);
     pop();
   }
 
-  drawPlaneWEBGL(p) {
+  drawPlaneWEBGL(p, color = undefined) {
+    color = color ? color : p.color;
+
     push();
     strokeWeight(0);
-    fill(...p.color, 40);
+    fill(...color);
+
     let angle = p.n.angleBetween(createVector(0, 1, 0));
     const rotationAxis = p.n.copy().cross(createVector(0, 1, 0));
 
@@ -502,44 +503,65 @@ class Board {
     return Math.min(distY, distZ);
   }
 
-  drawCone(c) {
-    this.drawPolygon(c.base, c.color);
+  drawCone(c, color = undefined) {
+    color = color ? color : c.color;
+
+    this.drawPolygon(c.base, color);
 
     if (c.PHLines) {
       for (let l of c.PHLines) {
-        this.drawSegmentedLine(l, true, false, c.color);
+        this.drawSegmentedLine(l, true, false, color);
       }
     }
 
     if (c.PVLines) {
       for (let l of c.PVLines) {
-        this.drawSegmentedLine(l, false, true, c.color);
+        this.drawSegmentedLine(l, false, true, color);
       }
     }
   }
 
-  drawConeWEBGL(c) {
+  drawConeWEBGL(c, color = undefined) {
+    color = color ? [...color] : [...c.color];
+    this.drawPolygonWEBGL(c.base, color);
+
+    color[3] = color[3] / 4;
+
     push();
     strokeWeight(0);
-    fill(...c.color, 40);
+    fill(...color);
     model(c.model);
-    this.drawPolygonWEBGL(c.base, c.color);
     pop();
   }
 
-  drawPyramid(p) {
+  drawPyramid(p, color = undefined) {
+    color = color ? color : p.color;
+
     for (let l of p.edges) {
-      this.drawSegmentedLine(l);
+      this.drawSegmentedLine(l, true, true, color);
     }
   }
-  drawPyramidWEBGL(p) {
+
+  drawPyramidWEBGL(p, color = undefined) {
+    color = color ? [...color] : [...p.color];
+
     for (let l of p.edges) {
-      this.drawSegmentedLineWEBGL(l);
+      this.drawSegmentedLineWEBGL(l, color);
     }
+
+    color[3] = color[3] / 4;
+
     push();
     strokeWeight(0);
-    fill(...p.color, 40);
+    fill(...color);
     model(p.model);
     pop();
+  }
+
+  alphaToColor(color) {
+    const alpha = [...color].pop();
+    color = color.map((x) => x * (alpha / 255));
+
+    return color;
   }
 }

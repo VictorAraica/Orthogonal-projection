@@ -39,3 +39,5 @@ nombre = trazaV(plano) 	                                                traza ve
 nombre = polygon(lados, plano, centro, vertice)                         poligono regular, devuelve las lineas del poligono y crea nuevos puntos con los vertices
 
 nombre = cone(vertice, plano, centro, punto_de_la_generatriz)           crea un cono con el plano de la base, el vertice, centro y un punto de la generatriz
+
+nombre = pyramid(nro_de_lados, vertice, plano, centro, punto_de_la_generatriz)           crea una piramide con el numero de caras de la base, el plano de la base, el vertice, centro y un punto de la generatriz

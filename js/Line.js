@@ -28,8 +28,7 @@ class Line {
     };
 
     this.show = true;
-    this.color = [250, 250, 250];
-    this.alpha = 1;
+    this.color = [250, 250, 250, 250];
     this.width = 2;
   }
 

@@ -4,13 +4,16 @@ class Pyramid {
     this.vertex = vertex;
     this.sides = sides;
     this.base = new Polygon(sides, plane, center, generatriz);
-    this.edges = this.base.lines;
+    this.edges = [...this.base.lines];
 
     for (let p of this.base.points) {
       this.edges.push(new SegmentedLine(p, vertex));
     }
 
     this.model = this.createModel(cellSize);
+
+    this.color = [250, 250, 250, 255];
+    this.show = true;
   }
 
   createModel(cellSize = 52) {

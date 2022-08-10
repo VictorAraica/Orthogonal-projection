@@ -28,9 +28,7 @@ class Plane {
     };
 
     this.show = true;
-    this.color = [250, 250, 250];
-    this.alpha = 1;
-    this.rad = 2;
+    this.color = [250, 250, 250, 40];
   }
 
   getPointUsingXY(x, y) {
