@@ -2,13 +2,14 @@ class Cone {
   constructor(vertex, plane, center, generatriz, cellSize = 52) {
     this.type = "cone";
     this.vertex = vertex;
-    this.base = new Polygon(30, plane, center, generatriz);
+    this.base = new Polygon(25, plane, center, generatriz);
 
     let biggerAnglePH = 0;
     let biggerAnglePV = 0;
     let PVPoints = [0, 0];
     let PHPoints = [0, 0];
-    for (let i = 0; i < this.base.points.length - 1; i++) {
+
+    for (let i = 0; i < this.base.points.length; i++) {
       for (let j = 0; j < this.base.points.length; j++) {
         let anglePH = this.angleBetweenPH(
           this.base.points[i],
@@ -16,6 +17,7 @@ class Cone {
           this.base.points[j],
           this.vertex
         );
+
         let anglePV = this.angleBetweenPV(
           this.base.points[i],
           this.vertex,
@@ -58,7 +60,7 @@ class Cone {
     }
 
     this.show = true;
-    this.color = [250, 250, 250, 40];
+    this.color = [250, 250, 250, 250];
     this.width = 2;
 
     this.model = this.createModel(cellSize);

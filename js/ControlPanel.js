@@ -125,9 +125,8 @@ class ControlPanel {
 
       "p4 = (10, 2, 10)",
 
-      "pyramid = pyramid(5, p4, plane, p1, p2)",
+      "cone = cone(p4, plane, p1, p2)",
 
-      "l = (p1, p2)",
       // "l = (p2, p3)",
       // "aux1 = perpendicularLine(p1, l)",
       // "A = intersection(l, aux1)",
@@ -612,7 +611,6 @@ class ControlPanel {
     // reset everything and update the dependencies,
     // if not updated by the user then update using the command given in the funciton
     if (value === "" && userUpdate) {
-      element.shape = "";
       element.name = "";
       element.command = "";
       element.input.placeholder = "";

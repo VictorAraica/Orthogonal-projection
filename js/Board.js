@@ -18,186 +18,6 @@ class Board {
     this.PH = new Plane(this.origin, new Point(2, 1, 0), new Point(3, 6, 0));
   }
 
-  addShape(shape, index) {
-    this.shapes.splice(index, 0, shape);
-  }
-
-  addShapes(shapes) {
-    this.shapes.push(...shapes);
-  }
-
-  draw(shape) {
-    if (shape.type === "point" && shape.show) {
-      this.drawPoint(shape);
-    } else if (shape.type === "line" && shape.show) {
-      this.drawLine(shape);
-    } else if (shape.type === "segmented line" && shape.show) {
-      this.drawSegmentedLine(shape);
-    } else if (shape.type === "polygon" && shape.show) {
-      this.drawPolygon(shape);
-    } else if (shape.type === "cone" && shape.show) {
-      this.drawCone(shape);
-    } else if (shape.type === "pyramid" && shape.show) {
-      this.drawPyramid(shape);
-    }
-  }
-
-  drawWEBGL(shape) {
-    if (Array.isArray(shape)) {
-      for (let i of shape) {
-        this.drawWEBGL(i);
-      }
-    } else if (shape.type === "point" && shape.show) {
-      this.drawPointWEBGL(shape);
-    } else if (shape.type === "line" && shape.show) {
-      this.drawLineWEBGL(shape);
-    } else if (shape.type === "segmented line" && shape.show) {
-      this.drawSegmentedLineWEBGL(shape);
-    } else if (shape.type === "plane" && shape.show) {
-      this.drawPlaneWEBGL(shape);
-    } else if (shape.type === "polygon" && shape.show) {
-      this.drawPolygonWEBGL(shape);
-    } else if (shape.type === "cone" && shape.show) {
-      this.drawConeWEBGL(shape);
-    } else if (shape.type === "pyramid" && shape.show) {
-      this.drawPyramidWEBGL(shape);
-    }
-  }
-
-  drawShapes() {
-    // draw shapes in the list
-    let shapes = [...this.shapes];
-    shapes.sort((a, b) => {
-      if (a.type === "plane") {
-        return 1;
-      } else {
-        return 0;
-      }
-    });
-    for (let shape of shapes) {
-      if (this.WEBGL) {
-        this.drawWEBGL(shape);
-      } else {
-        this.draw(shape);
-      }
-    }
-  }
-
-  moveCameraPos() {
-    // move the camera depending on the mouse drag
-    if (mouseX > this.xLimit) {
-      const dif = this.pixelToScale(mouseX, mouseY).sub(
-        this.pixelToScale(pmouseX, pmouseY)
-      );
-      this.cameraPos.add(dif);
-    }
-  }
-
-  moveCameraPosWEBGL(e) {
-    // move the camera depending on the mouse drag
-    if (mouseX > this.xLimit) {
-      const difX = mouseX - pmouseX;
-      const difY = mouseY - pmouseY;
-      if (e.ctrlKey || e.buttons === 2) {
-        this.translateXWEBGL += difX;
-        this.translateYWEBGL += difY;
-      } else {
-        this.rotateYWEBGL += difX * 0.001;
-        this.rotateXWEBGL -= difY * 0.001;
-      }
-    }
-  }
-
-  zoom(e) {
-    if (mouseX > this.xLimit) {
-      e.preventDefault();
-      if (e.deltaY > 0) {
-        this.cellSize *= 0.9;
-        if (this.cellSize < 18) {
-          this.cellSize = 18;
-        }
-      } else {
-        this.cellSize *= 1.1;
-      }
-    }
-  }
-
-  zoomWEBGL(e) {
-    if (mouseX > this.xLimit) {
-      e.preventDefault();
-      if (e.ctrlKey) {
-        if (e.deltaY > 0) {
-          this.translateZWEBGL -= this.cellSizeWEBGL;
-        } else {
-          this.translateZWEBGL += this.cellSizeWEBGL;
-        }
-      } else {
-        if (e.deltaY > 0) {
-          this.cellSizeWEBGL *= 0.9;
-        } else {
-          this.cellSizeWEBGL *= 1.1;
-        }
-      }
-      for (let shape of this.shapes) {
-        if (shape.type === "cone" || shape.type === "pyramid") {
-          shape.model = shape.createModel(this.cellSizeWEBGL);
-        }
-      }
-    }
-  }
-
-  pixelToScale(x, y) {
-    // pixel position to real position
-    const scaleX = x / this.cellSize - this.cameraPos.x;
-    const scaleY = y / this.cellSize - this.cameraPos.y;
-
-    return createVector(scaleX, scaleY, -scaleY);
-  }
-
-  scaleToPixel(x, y) {
-    // real position to pixel position
-    const pixelX = x * this.cellSize + this.cameraPos.x * this.cellSize;
-
-    const pixelY = y * this.cellSize + this.cameraPos.y * this.cellSize;
-
-    return createVector(pixelX, pixelY);
-  }
-
-  drawBackground() {
-    // draw background grid and lt
-    stroke(50, 50, 50);
-    strokeWeight(1);
-
-    for (
-      // % 1 to start the lines in the offset
-      let i = (this.cameraPos.x % 1) * this.cellSize;
-      i < windowWidth;
-      i += this.cellSize
-    ) {
-      line(i, 0, i, windowHeight);
-    }
-
-    for (
-      let i = (this.cameraPos.y % 1) * this.cellSize;
-      i < windowHeight;
-      i += this.cellSize
-    ) {
-      line(0, i, windowWidth, i);
-    }
-
-    this.drawLT();
-  }
-
-  drawLT() {
-    // draw earth line
-    stroke(250, 250, 250);
-    strokeWeight(3);
-    origin = this.scaleToPixel(0, 0);
-
-    line(0, origin.y, windowWidth, origin.y);
-    line(origin.x, origin.y + 15, origin.x, origin.y - 15);
-  }
-
   drawPoint(p, color = undefined) {
     if (typeof p !== "object" || p === null) {
       return false;
@@ -297,6 +117,27 @@ class Board {
     }
   }
 
+  drawPyramid(p, color = undefined) {
+    color = color ? color : p.color;
+
+    for (let l of p.edges) {
+      this.drawSegmentedLine(l, true, true, color);
+    }
+  }
+
+  drawCone(c, color = undefined) {
+    color = color ? color : c.color;
+    this.drawPolygon(c.base, color);
+
+    for (let l of c.PHLines) {
+      this.drawSegmentedLine(l, true, false, color);
+    }
+
+    for (let l of c.PVLines) {
+      this.drawSegmentedLine(l, false, true, color);
+    }
+  }
+
   drawPointWEBGL(p, color = undefined) {
     if (typeof p !== "object" || p === null) {
       return false;
@@ -385,55 +226,6 @@ class Board {
     line(x1, y1, z1, x2, y2, z2);
   }
 
-  drawPolygonWEBGL(shape, color = undefined) {
-    color = color ? color : shape.color;
-
-    for (let line of shape.lines) {
-      this.drawSegmentedLineWEBGL(line, color);
-    }
-  }
-
-  drawPV() {
-    push();
-    const planeWidth = windowHeight * 0.07 + windowWidth / 2;
-    const planeHeight = windowHeight * 0.57;
-    translate(
-      planeWidth / 2 - windowHeight * 0.07,
-      -planeHeight / 2 + windowHeight * 0.07
-    );
-    strokeWeight(0);
-    fill(0, 100, 100, 40);
-    plane(planeWidth, planeHeight);
-    pop();
-  }
-
-  drawPH() {
-    push();
-    const planeWidth = windowHeight * 0.07 + windowWidth / 2;
-    const planeHeight = windowHeight * 0.57;
-    strokeWeight(0);
-    fill(0, 100, 100, 40);
-    rotateX(PI / 2);
-    translate(
-      planeWidth / 2 - windowHeight * 0.07,
-      planeHeight / 2 - windowHeight * 0.07
-    );
-    plane(planeWidth, planeHeight);
-    pop();
-  }
-
-  drawAxisWEBGL() {
-    push();
-    stroke(255, 0, 0);
-    strokeWeight(3);
-    line(-windowHeight * 0.07, 0, 0, windowWidth / 2, 0, 0);
-    stroke(0, 0, 255);
-    line(0, windowHeight * 0.07, 0, 0, -windowHeight / 2, 0);
-    stroke(0, 255, 0);
-    line(0, 0, -windowHeight * 0.07, 0, 0, windowHeight / 2);
-    pop();
-  }
-
   drawPlaneWEBGL(p, color = undefined) {
     color = color ? color : p.color;
 
@@ -466,6 +258,187 @@ class Board {
 
     plane(this.cellSizeWEBGL * 35, this.cellSizeWEBGL * 35);
     pop();
+  }
+
+  drawPolygonWEBGL(shape, color = undefined) {
+    color = color ? color : shape.color;
+
+    for (let line of shape.lines) {
+      this.drawSegmentedLineWEBGL(line, color);
+    }
+  }
+
+  drawPyramidWEBGL(p, color = undefined) {
+    color = color ? [...color] : [...p.color];
+
+    for (let l of p.edges) {
+      this.drawSegmentedLineWEBGL(l, color);
+    }
+
+    color[3] = color[3] / 4;
+
+    push();
+    strokeWeight(0);
+    fill(...color);
+    model(p.model);
+    pop();
+  }
+
+  drawConeWEBGL(c, color = undefined) {
+    color = color ? [...color] : [...c.color];
+    this.drawPolygonWEBGL(c.base, color);
+
+    color[3] = color[3] / 4;
+
+    push();
+    strokeWeight(0);
+    fill(...color);
+    model(c.model);
+    pop();
+  }
+
+  drawPV() {
+    push();
+    const planeWidth = windowHeight * 0.07 + windowWidth / 2;
+    const planeHeight = windowHeight * 0.57;
+    translate(
+      planeWidth / 2 - windowHeight * 0.07,
+      -planeHeight / 2 + windowHeight * 0.07
+    );
+    strokeWeight(0);
+    fill(0, 100, 100, 40);
+    plane(planeWidth, planeHeight);
+    pop();
+  }
+
+  drawPH() {
+    push();
+    const planeWidth = windowHeight * 0.07 + windowWidth / 2;
+    const planeHeight = windowHeight * 0.57;
+    strokeWeight(0);
+    fill(0, 100, 100, 40);
+    rotateX(PI / 2);
+    translate(
+      planeWidth / 2 - windowHeight * 0.07,
+      planeHeight / 2 - windowHeight * 0.07
+    );
+    plane(planeWidth, planeHeight);
+    pop();
+  }
+
+  drawBackground() {
+    // draw background grid and lt
+    stroke(50, 50, 50);
+    strokeWeight(1);
+
+    for (
+      // % 1 to start the lines in the offset
+      let i = (this.cameraPos.x % 1) * this.cellSize;
+      i < windowWidth;
+      i += this.cellSize
+    ) {
+      line(i, 0, i, windowHeight);
+    }
+
+    for (
+      let i = (this.cameraPos.y % 1) * this.cellSize;
+      i < windowHeight;
+      i += this.cellSize
+    ) {
+      line(0, i, windowWidth, i);
+    }
+
+    this.drawLT();
+  }
+
+  drawLT() {
+    // draw earth line
+    stroke(250, 250, 250);
+    strokeWeight(3);
+    origin = this.scaleToPixel(0, 0);
+
+    line(0, origin.y, windowWidth, origin.y);
+    line(origin.x, origin.y + 15, origin.x, origin.y - 15);
+  }
+
+  drawAxisWEBGL() {
+    push();
+    stroke(255, 0, 0);
+    strokeWeight(3);
+    line(-windowHeight * 0.07, 0, 0, windowWidth / 2, 0, 0);
+    stroke(0, 0, 255);
+    line(0, windowHeight * 0.07, 0, 0, -windowHeight / 2, 0);
+    stroke(0, 255, 0);
+    line(0, 0, -windowHeight * 0.07, 0, 0, windowHeight / 2);
+    pop();
+  }
+
+  draw(shape) {
+    if (shape.type === "point" && shape.show) {
+      this.drawPoint(shape);
+    } else if (shape.type === "line" && shape.show) {
+      this.drawLine(shape);
+    } else if (shape.type === "segmented line" && shape.show) {
+      this.drawSegmentedLine(shape);
+    } else if (shape.type === "polygon" && shape.show) {
+      this.drawPolygon(shape);
+    } else if (shape.type === "cone" && shape.show) {
+      this.drawCone(shape);
+    } else if (shape.type === "pyramid" && shape.show) {
+      this.drawPyramid(shape);
+    }
+  }
+
+  drawWEBGL(shape) {
+    if (Array.isArray(shape)) {
+      for (let i of shape) {
+        this.drawWEBGL(i);
+      }
+    } else if (shape.type === "point" && shape.show) {
+      this.drawPointWEBGL(shape);
+    } else if (shape.type === "line" && shape.show) {
+      this.drawLineWEBGL(shape);
+    } else if (shape.type === "segmented line" && shape.show) {
+      this.drawSegmentedLineWEBGL(shape);
+    } else if (shape.type === "plane" && shape.show) {
+      this.drawPlaneWEBGL(shape);
+    } else if (shape.type === "polygon" && shape.show) {
+      this.drawPolygonWEBGL(shape);
+    } else if (shape.type === "cone" && shape.show) {
+      this.drawConeWEBGL(shape);
+    } else if (shape.type === "pyramid" && shape.show) {
+      this.drawPyramidWEBGL(shape);
+    }
+  }
+
+  drawShapes() {
+    // draw shapes in the list
+    if (this.WEBGL) {
+      // sort array to draw planes last
+      let shapes = [...this.shapes];
+      shapes.sort((a, b) => {
+        if (a.type === "plane") {
+          return 1;
+        } else {
+          return 0;
+        }
+      });
+
+      for (let shape of shapes) {
+        this.drawWEBGL(shape);
+      }
+    } else {
+      for (let shape of this.shapes) {
+        this.draw(shape);
+      }
+    }
+  }
+
+  alphaToColor(color) {
+    const alpha = [...color].pop();
+    color = color.map((x) => x * (alpha / 255));
+
+    return color;
   }
 
   getLineBorderPoints(p1, p2) {
@@ -503,65 +476,91 @@ class Board {
     return Math.min(distY, distZ);
   }
 
-  drawCone(c, color = undefined) {
-    color = color ? color : c.color;
+  addShape(shape, index) {
+    this.shapes.splice(index, 0, shape);
+  }
 
-    this.drawPolygon(c.base, color);
+  addShapes(shapes) {
+    this.shapes.push(...shapes);
+  }
 
-    if (c.PHLines) {
-      for (let l of c.PHLines) {
-        this.drawSegmentedLine(l, true, false, color);
+  moveCameraPos() {
+    // move the camera depending on the mouse drag
+    if (mouseX > this.xLimit) {
+      const dif = this.pixelToScale(mouseX, mouseY).sub(
+        this.pixelToScale(pmouseX, pmouseY)
+      );
+      this.cameraPos.add(dif);
+    }
+  }
+
+  moveCameraPosWEBGL(e) {
+    // move the camera depending on the mouse drag
+    if (mouseX > this.xLimit) {
+      const difX = mouseX - pmouseX;
+      const difY = mouseY - pmouseY;
+      if (e.ctrlKey || e.buttons === 2) {
+        this.translateXWEBGL += difX;
+        this.translateYWEBGL += difY;
+      } else {
+        this.rotateYWEBGL += difX * 0.001;
+        this.rotateXWEBGL -= difY * 0.001;
       }
     }
+  }
 
-    if (c.PVLines) {
-      for (let l of c.PVLines) {
-        this.drawSegmentedLine(l, false, true, color);
+  zoom(e) {
+    if (mouseX > this.xLimit) {
+      e.preventDefault();
+      if (e.deltaY > 0) {
+        this.cellSize *= 0.9;
+        if (this.cellSize < 18) {
+          this.cellSize = 18;
+        }
+      } else {
+        this.cellSize *= 1.1;
       }
     }
   }
 
-  drawConeWEBGL(c, color = undefined) {
-    color = color ? [...color] : [...c.color];
-    this.drawPolygonWEBGL(c.base, color);
-
-    color[3] = color[3] / 4;
-
-    push();
-    strokeWeight(0);
-    fill(...color);
-    model(c.model);
-    pop();
-  }
-
-  drawPyramid(p, color = undefined) {
-    color = color ? color : p.color;
-
-    for (let l of p.edges) {
-      this.drawSegmentedLine(l, true, true, color);
+  zoomWEBGL(e) {
+    if (mouseX > this.xLimit) {
+      e.preventDefault();
+      if (e.ctrlKey) {
+        if (e.deltaY > 0) {
+          this.translateZWEBGL -= this.cellSizeWEBGL;
+        } else {
+          this.translateZWEBGL += this.cellSizeWEBGL;
+        }
+      } else {
+        if (e.deltaY > 0) {
+          this.cellSizeWEBGL *= 0.9;
+        } else {
+          this.cellSizeWEBGL *= 1.1;
+        }
+      }
+      for (let shape of this.shapes) {
+        if (shape.type === "cone" || shape.type === "pyramid") {
+          shape.model = shape.createModel(this.cellSizeWEBGL);
+        }
+      }
     }
   }
 
-  drawPyramidWEBGL(p, color = undefined) {
-    color = color ? [...color] : [...p.color];
+  pixelToScale(x, y) {
+    // pixel position to real position
+    const scaleX = x / this.cellSize - this.cameraPos.x;
+    const scaleY = y / this.cellSize - this.cameraPos.y;
 
-    for (let l of p.edges) {
-      this.drawSegmentedLineWEBGL(l, color);
-    }
-
-    color[3] = color[3] / 4;
-
-    push();
-    strokeWeight(0);
-    fill(...color);
-    model(p.model);
-    pop();
+    return createVector(scaleX, scaleY, -scaleY);
   }
 
-  alphaToColor(color) {
-    const alpha = [...color].pop();
-    color = color.map((x) => x * (alpha / 255));
+  scaleToPixel(x, y) {
+    // real position to pixel position
+    const pixelX = x * this.cellSize + this.cameraPos.x * this.cellSize;
 
-    return color;
+    const pixelY = y * this.cellSize + this.cameraPos.y * this.cellSize;
+
+    return createVector(pixelX, pixelY);
   }
 }
