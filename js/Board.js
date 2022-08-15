@@ -2,6 +2,7 @@ class Board {
   constructor(cellSize = 52) {
     this.cellSize = cellSize;
     this.cellSizeWEBGL = cellSize;
+    this.planeSize = 35;
     this.cameraPos = createVector(8, windowHeight / this.cellSize / 2);
     this.shapes = [];
     this.xLimit = 0;
@@ -256,7 +257,10 @@ class Board {
       rotate(angle, rotationAxis2);
     }
 
-    plane(this.cellSizeWEBGL * 35, this.cellSizeWEBGL * 35);
+    plane(
+      this.cellSizeWEBGL * this.planeSize,
+      this.cellSizeWEBGL * this.planeSize
+    );
     pop();
   }
 

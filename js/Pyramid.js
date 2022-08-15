@@ -12,7 +12,7 @@ class Pyramid {
 
     this.model = this.createModel(cellSize);
 
-    this.color = [250, 250, 250, 255];
+    this.color = [255, 255, 255, 255];
     this.show = true;
   }
 

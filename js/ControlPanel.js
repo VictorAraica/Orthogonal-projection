@@ -17,6 +17,7 @@ class ControlPanel {
     // optionsButton
     // optionsOpen
     // visibilityButton
+    // index
     // }
     this.inputs = [];
     this.functions = [
@@ -117,15 +118,25 @@ class ControlPanel {
       this.createInput("");
     };
 
-    let commands = [
+    this.commands = [
       "p1 = (1, 8, 4)",
       "p2 = (5.3, 11, 1)",
       "p3 = (3, 12, 4)",
+
       "plane = (p1, p2, p3)",
 
       "p4 = (10, 2, 10)",
-
       "cone = cone(p4, plane, p1, p2)",
+
+      "p5 = (15, 12, -2)",
+      "p6 = (19, 13, 1)",
+      "p7 = (14, 3, 4)",
+      "plane2 = (p5, p6, p7)",
+
+      "p8 = (4, 15, 4)",
+      "plane2 = (p5, p6, p7)",
+      "pyramid = pyramid(5, p8, plane2, p5, p6)",
+      "inter = intersection(plane, plane2)",
 
       // "l = (p2, p3)",
       // "aux1 = perpendicularLine(p1, l)",
@@ -156,14 +167,11 @@ class ControlPanel {
       // "a11 = segment(E, D)",
       // "a12 = segment(E, C)",
     ];
+  }
 
-    for (let command of commands) {
+  runCommands() {
+    for (let command of this.commands) {
       this.createInput(command);
-    }
-
-    for (let i = 0; i < this.inputs.length; i++) {
-      this.inputs[i].input.value = commands[i];
-      this.updateInput(i);
     }
   }
 
@@ -477,16 +485,8 @@ class ControlPanel {
     return "error creating the shape";
   }
 
-  polygon(index, name, parameters) {
-    let inputs = parameters.map((parameter) => {
-      return this.inputs.find((element) => element.name === parameter);
-    });
-    let polygon = new Polygon(
-      parameters[0],
-      inputs[1].shape,
-      inputs[2].shape,
-      inputs[3].shape
-    );
+  polygon(index, name, sides, plane, center, vertex) {
+    const polygon = new Polygon(sides, plane.shape, center.shape, vertex.shape);
 
     let names = polygon.points.map((_, i) => `${name}${i}`);
 
@@ -510,7 +510,7 @@ class ControlPanel {
     }
 
     if (polygon) {
-      this.addDependencies(index, [inputs[1], inputs[2], inputs[3]]);
+      this.addDependencies(index, [plane, center, vertex]);
       return polygon;
     }
 
@@ -551,7 +551,7 @@ class ControlPanel {
     return false;
   }
 
-  functionToShape(index, functionName, parameters) {
+  functionToShape(index, functionName, parameters, name = undefined) {
     let shape = "error creating the shape";
     if (!functionName in this.functions) {
       return shape;
@@ -560,6 +560,15 @@ class ControlPanel {
     let inputs = parameters.map((parameter) => {
       return this.inputs.find((element) => element.name === parameter);
     });
+
+    // if polygon or pyramid remove number of sides from inputs
+    if (["polygon", "pyramid"].includes(functionName)) {
+      inputs.shift();
+    }
+    // check if inputs exists
+    if (inputs.includes(undefined)) {
+      return "argument not found";
+    }
 
     if (functionName === "intersection") {
       shape = this.intersection(index, ...inputs);
@@ -575,10 +584,11 @@ class ControlPanel {
       shape = this.trazaH(index, ...inputs);
     } else if (functionName === "trazaV") {
       shape = this.trazaV(index, ...inputs);
+    } else if (functionName === "polygon") {
+      shape = this.polygon(index, name, parameters[0], ...inputs);
     } else if (functionName === "cone") {
       shape = this.cone(index, ...inputs);
     } else if (functionName === "pyramid") {
-      inputs.shift();
       shape = this.pyramid(index, parameters[0], ...inputs);
     }
 
@@ -600,16 +610,18 @@ class ControlPanel {
   blurError(element, error) {
     this.board.shapes[element.input.index] = false;
     element.input.value = "";
+    element.shape = false;
+    element.command = "";
     element.input.placeholder = error;
   }
 
-  updateInput(index, userUpdate = true) {
+  getValueAndElement(index, userUpdate = true) {
     let element = this.inputs[index];
     let value = element.input.value;
 
     // if input is empty because the user deleted the command
     // reset everything and update the dependencies,
-    // if not updated by the user then update using the command given in the funciton
+    // if not updated by the user then update using the command given in the element
     if (value === "" && userUpdate) {
       element.name = "";
       element.command = "";
@@ -626,6 +638,32 @@ class ControlPanel {
       value = element.command;
     }
 
+    return { element, value };
+  }
+
+  checkSameNameElement(name, element) {
+    // find elements with the same name
+    let sameNameElem = this.inputs.find((element) => element.name == name);
+    console.log(this.inputs);
+
+    // if there is an element with the same name and its not this one throw error
+    if (sameNameElem) {
+      if (sameNameElem.index !== element.index) {
+        this.blurError(element, "name already used");
+        return true;
+      }
+    }
+    return false;
+  }
+
+  updateInput(index, userUpdate = true) {
+    let { element, value } = this.getValueAndElement(index, userUpdate);
+
+    if (value === "example") {
+      this.runCommands();
+      return true;
+    }
+
     // ---------------------------------------------
 
     // split on = and get name and data
@@ -639,16 +677,7 @@ class ControlPanel {
 
     // ---------------------------------------------
 
-    // find elements with the same name
-    let sameNameElem = this.inputs.find((element) => element.name === name);
-
-    // if there is an element with the same name and its not this one throw error
-    if (sameNameElem) {
-      if (sameNameElem.input.index !== index) {
-        this.blurError(element, "name already used");
-        return false;
-      }
-    }
+    if (this.checkSameNameElement(name, element)) return false;
 
     // ---------------------------------------------
     let shape = false;
@@ -656,18 +685,13 @@ class ControlPanel {
     const functionRegex = /\w+\(.+\,?.*\,?.*?\,?.*?\)/;
     // if command is a function
     if (data.match(functionRegex)) {
+      // get function and parameters
       let [functionName, parameters] = data.replace(/\)/g, "").split("(");
       parameters = parameters.split(",");
 
-      if (functionName === "polygon") {
-        shape = this.polygon(index, name, parameters);
-      } else {
-        shape = this.functionToShape(index, functionName, parameters);
-      }
-      if (typeof shape === "string" || shape instanceof String) {
-        this.blurError(element, shape);
-        return false;
-      }
+      shape = this.functionToShape(index, functionName, parameters, name);
+
+      // format command
       element.command = `${name} = ${functionName}(${parameters.join(", ")})`;
     } else {
       data = data.replace(/\(|\)/g, "").split(",");
@@ -679,16 +703,17 @@ class ControlPanel {
 
       shape = this.textToShape(data, index);
 
-      if (typeof shape === "string" || shape instanceof String) {
-        this.blurError(element, shape);
-        return false;
-      }
-
       element.command = `${name} = (${data.join(", ")})`;
     }
 
+    // if error creating shape display error
+    if (typeof shape === "string" || shape instanceof String) {
+      this.blurError(element, shape);
+      return false;
+    }
+
     // ---------------------------------------------
-    shape.show = true;
+
     // if this input already has a shape then replace it
     if (this.board.shapes[index]) {
       // get the color and show of the shape if the shape existed
@@ -745,6 +770,7 @@ class ControlPanel {
       show: true,
       optionsButton,
       visibilityButton: inputVisibilityElement,
+      index: input.index,
     });
     input.focus();
 
