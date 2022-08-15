@@ -134,7 +134,6 @@ class ControlPanel {
       "plane2 = (p5, p6, p7)",
 
       "p8 = (4, 15, 4)",
-      "plane2 = (p5, p6, p7)",
       "pyramid = pyramid(5, p8, plane2, p5, p6)",
       "inter = intersection(plane, plane2)",
 
@@ -644,7 +643,6 @@ class ControlPanel {
   checkSameNameElement(name, element) {
     // find elements with the same name
     let sameNameElem = this.inputs.find((element) => element.name == name);
-    console.log(this.inputs);
 
     // if there is an element with the same name and its not this one throw error
     if (sameNameElem) {
