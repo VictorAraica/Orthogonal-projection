@@ -658,6 +658,7 @@ class ControlPanel {
     let { element, value } = this.getValueAndElement(index, userUpdate);
 
     if (value === "example") {
+      this.board.shapes[index] = { type: "none" };
       this.runCommands();
       return true;
     }
